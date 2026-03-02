@@ -2,3 +2,5 @@ de:
  errorloading: Es gab ein Fehler im Laden eines Spieles oder System.
  gamecorrupteddata: Der Spiel hat beschädigte Dateien, melden sie eine Admin.
  gamesuccessloaded: Die Spiel wurde erforgleich geladen! 
+ adminblockeduser: Admin hat dein Account blockiert.
+ userbanned: Die Benutzer wurde gebannt.
