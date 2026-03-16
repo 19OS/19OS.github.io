@@ -2,7 +2,6 @@
 
 Welcome to the **19OS.github.io** repository — the source code for the 19OS GitHub Pages site.
 
-This project hosts the official web presence for *19OS* using GitHub Pages. It includes the content, layout, assets, and configuration required to build and publish your site automatically whenever changes are pushed to this repo.
 
 ---
 
