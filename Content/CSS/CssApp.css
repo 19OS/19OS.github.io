@@ -1,1 +1,13 @@
-
+.appwindow {
+  color: white;
+  background: grey;
+}
+.appwindow button {
+  width:100px;
+  height:50px;
+}
+.appbtn {
+  width: 10%;
+  height:100%;
+  color: black;
+}
