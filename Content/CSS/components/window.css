@@ -1,0 +1,27 @@
+.appwindow {
+  position:absolute;
+  width:400px;
+  height:300px;
+  padding:16px;
+  border-radius: var(--radius);
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--blur));
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--shadow-soft);
+}
+
+.window-titlebar {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:10px;
+  font-weight:bold;
+}
+
+.window-controls button {
+  width:18px;
+  height:18px;
+  border-radius:50%;
+  border:none;
+  cursor:pointer;
+}
