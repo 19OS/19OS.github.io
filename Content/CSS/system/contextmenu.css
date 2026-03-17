@@ -1,20 +1,192 @@
+/* =========================
+   Context Menu Base
+========================= */
 .contextmenu {
-  position:absolute;
-  min-width:180px;
-  padding:6px;
-  border-radius:10px;
+  position: absolute;
+  min-width: 180px;
+  padding: 6px;
+  border-radius: 10px;
+
   background: var(--glass-bg);
   backdrop-filter: blur(16px);
-  border:1px solid var(--glass-border);
+  border: 1px solid var(--glass-border);
+
+  box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+
+  animation: contextMenuOpen 0.18s cubic-bezier(.25,.8,.25,1);
+  transform-origin: top left;
+  z-index: 9999;
 }
 
+/* Closing state */
+.contextmenu.closing {
+  animation: contextMenuClose 0.15s ease-in forwards;
+}
+
+/* =========================
+   Items
+========================= */
 .contextmenu-item {
-  padding:8px 10px;
-  border-radius:6px;
-  cursor:pointer;
-  transition:.2s;
+  position: relative;
+  padding: 8px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: 0.2s;
+
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  animation: itemFadeIn 0.2s ease forwards;
 }
 
+/* Hover */
 .contextmenu-item:hover {
   background: var(--glass-hover);
+  transform: translateX(4px);
+}
+
+/* Click */
+.contextmenu-item:active {
+  transform: scale(0.96);
+}
+
+/* Disabled item */
+.contextmenu-item.disabled {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+/* =========================
+   Separator
+========================= */
+.contextmenu-separator {
+  height: 1px;
+  margin: 6px 4px;
+  background: var(--glass-border);
+  opacity: 0.6;
+}
+
+/* =========================
+   Icons (optional)
+========================= */
+.contextmenu-item i,
+.contextmenu-item svg {
+  width: 16px;
+  height: 16px;
+  opacity: 0.8;
+}
+
+/* =========================
+   Ripple Effect
+========================= */
+.contextmenu-item {
+  overflow: hidden;
+}
+
+.contextmenu-item::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  background: rgba(255,255,255,0.2);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  transition: width .3s, height .3s;
+}
+
+.contextmenu-item:active::after {
+  width: 200px;
+  height: 200px;
+}
+
+/* =========================
+   Animations
+========================= */
+
+/* Open */
+@keyframes contextMenuOpen {
+  0% {
+    opacity: 0;
+    transform: scale(.9) translateY(10px);
+  }
+  60% {
+    opacity: 1;
+    transform: scale(1.02) translateY(-2px);
+  }
+  100% {
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* Close */
+@keyframes contextMenuClose {
+  from {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: scale(.9) translateY(10px);
+  }
+}
+
+/* Item Fade */
+@keyframes itemFadeIn {
+  from {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* =========================
+   Stagger Effect
+========================= */
+.contextmenu-item:nth-child(1) { animation-delay: 0.02s; }
+.contextmenu-item:nth-child(2) { animation-delay: 0.04s; }
+.contextmenu-item:nth-child(3) { animation-delay: 0.06s; }
+.contextmenu-item:nth-child(4) { animation-delay: 0.08s; }
+.contextmenu-item:nth-child(5) { animation-delay: 0.1s; }
+.contextmenu-item:nth-child(6) { animation-delay: 0.12s; }
+.contextmenu-item:nth-child(7) { animation-delay: 0.14s; }
+
+/* =========================
+   Submenu Support (optional)
+========================= */
+.contextmenu-item.has-submenu::after {
+  content: "▶";
+  margin-left: auto;
+  font-size: 12px;
+  opacity: 0.6;
+}
+
+.contextmenu-submenu {
+  position: absolute;
+  top: 0;
+  left: 100%;
+  margin-left: 6px;
+
+  min-width: 180px;
+  padding: 6px;
+  border-radius: 10px;
+
+  background: var(--glass-bg);
+  backdrop-filter: blur(16px);
+  border: 1px solid var(--glass-border);
+
+  box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+
+  display: none;
+}
+
+/* Show submenu on hover */
+.contextmenu-item:hover > .contextmenu-submenu {
+  display: block;
+  animation: contextMenuOpen 0.15s ease;
 }
