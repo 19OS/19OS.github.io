@@ -1,117 +1,110 @@
 const display = document.getElementById("display");
+const liveResult = document.getElementById("liveResult");
 const historyList = document.getElementById("history");
 
 let history = [];
 
-// ✅ Reset safely if display is broken
-function normalizeDisplay() {
-  if (display.value === "Error" || display.value === "Infinity") {
-    display.value = "";
+// 🔒 Clean expression
+function sanitize(expr) {
+  return expr
+    .replace(/[^0-9+\-*/.^()%]/g, "")
+    .replace(/(\.\.)+/g, ".")
+    .replace(/([+\-*/^]){2,}/g, "$1")
+    .replace(/^([*/^])/, "");
+}
+
+// ❗ Check if incomplete
+function isIncomplete(expr) {
+  return /[+\-*/.^]$/.test(expr);
+}
+
+// 🧠 Safe eval
+function safeEval(expr) {
+  if (!expr) return "";
+
+  expr = sanitize(expr).replace(/\^/g, "**");
+
+  try {
+    const result = eval(expr);
+    if (!isFinite(result)) return "Error";
+    return result;
+  } catch {
+    return "";
   }
 }
 
-// ✅ Clean expression (fix glitches)
-function sanitize(expr) {
-  return expr
-    .replace(/[^0-9+\-*/.^()%]/g, "")   // remove junk
-    .replace(/(\.\.)+/g, ".")           // fix double dots
-    .replace(/([+\-*/^]){2,}/g, "$1")   // fix double operators
-    .replace(/^([*/^])/, "");           // no invalid start
+// ✨ LIVE RESULT
+function updateLive() {
+  const expr = display.value;
+
+  if (!expr || isIncomplete(expr)) {
+    liveResult.textContent = "= …";
+    return;
+  }
+
+  const result = safeEval(expr);
+
+  if (result === "" || result === "Error") {
+    liveResult.textContent = "= …";
+  } else {
+    liveResult.textContent = "= " + result;
+  }
 }
 
+// ➕ Input
 function add(value) {
-  normalizeDisplay();
+  if (display.value === "Error") display.value = "";
 
-  let newValue = display.value + value;
-  newValue = sanitize(newValue);
-
-  display.value = newValue;
+  display.value = sanitize(display.value + value);
+  updateLive();
 }
 
 function clearDisplay() {
   display.value = "";
+  updateLive();
 }
 
 function backspace() {
-  normalizeDisplay();
   display.value = display.value.slice(0, -1);
+  updateLive();
 }
 
-function safeEval(expr) {
-  if (!expr) return 0;
-
-  expr = sanitize(expr);
-
-  // Replace ^ with **
-  expr = expr.replace(/\^/g, "**");
-
-  try {
-    const result = eval(expr);
-
-    if (!isFinite(result)) throw "Math error";
-
-    return result;
-  } catch {
-    throw "Error";
-  }
-}
-
-function percent() {
-  try {
-    const val = safeEval(display.value);
-    display.value = String(val / 100);
-  } catch {
-    display.value = "Error";
-  }
-}
-
-function square() {
-  try {
-    const val = safeEval(display.value);
-    display.value = String(val ** 2);
-  } catch {
-    display.value = "Error";
-  }
-}
-
-function sqrt() {
-  try {
-    const val = safeEval(display.value);
-    if (val < 0) throw "Invalid";
-    display.value = String(Math.sqrt(val));
-  } catch {
-    display.value = "Error";
-  }
-}
-
+// 🎯 Calculate
 function calculate() {
-  try {
-    const expression = display.value;
-    const result = safeEval(expression);
+  let expr = display.value;
 
-    display.value = result;
-    addHistory(expression + " = " + result);
-
-  } catch {
-    display.value = "Error";
+  if (isIncomplete(expr)) {
+    expr = expr.slice(0, -1);
   }
+
+  const result = safeEval(expr);
+
+  if (result === "" || result === "Error") {
+    display.value = "Error";
+    liveResult.textContent = "= ?";
+    return;
+  }
+
+  display.value = result;
+  liveResult.textContent = "= " + result;
+
+  addHistory(expr + " = " + result);
 }
 
+// 📜 History
 function addHistory(entry) {
   history.unshift(entry);
-
   if (history.length > 10) history.pop();
 
   if (historyList) {
     historyList.innerHTML = "";
-
     history.forEach(item => {
       const li = document.createElement("li");
       li.textContent = item;
 
-      // ✅ Safe reuse
       li.onclick = () => {
         display.value = item.split("=")[0].trim();
+        updateLive();
       };
 
       historyList.appendChild(li);
@@ -119,7 +112,7 @@ function addHistory(entry) {
   }
 }
 
-// ✅ STRONG keyboard protection
+// ⌨️ Keyboard
 document.addEventListener("keydown", (e) => {
   if (e.ctrlKey || e.metaKey) return;
 
