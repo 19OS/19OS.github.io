@@ -15,23 +15,23 @@
   <div id="app1" class="appwindow hidden">
     <div class="titlebar">
       <span>App 1</span>
-      <button onclick="closeWindow('app1')">✕</button>
+      <button class="close-btn" data-close="app1">✕</button>
     </div>
     <div class="content">Hello from App 1</div>
   </div>
 
   <div id="app2" class="appwindow hidden">
-    <div class="window-titlebar">
+    <div class="titlebar">
       <span>App 2</span>
-      <button onclick="closeWindow('app2')">✕</button>
+      <button class="close-btn" data-close="app2">✕</button>
     </div>
     <div class="content">Hello from App 2</div>
   </div>
 
   <!-- DOCK -->
   <div class="dock glass">
-    <div class="dock-icon" onclick="openWindow('app1')">App1</div>
-    <div class="dock-icon" onclick="openWindow('app2')">App2</div>
+    <div class="dock-icon" data-open="app1">App1</div>
+    <div class="dock-icon" data-open="app2">App2</div>
   </div>
 
 </div>
