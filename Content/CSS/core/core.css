@@ -12,7 +12,9 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
-
+.hidden {
+  display: none;
+}
 .glass {
   background: var(--glass-bg);
   backdrop-filter: blur(var(--blur)) saturate(160%);
