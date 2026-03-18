@@ -1,32 +1,25 @@
+// ---------- Open/Close Windows ----------
 function openWindow(id) {
   const el = document.getElementById(id);
-  if (!el) return;
+  if (!el) return console.warn("Window not found:", id);
+
   el.classList.remove("hidden");
+  el.style.display = "block";
 }
 
 function closeWindow(id) {
   const el = document.getElementById(id);
-  if (!el) return;
+  if (!el) return console.warn("Window not found:", id);
+
   el.classList.add("hidden");
+  el.style.display = "none";
 }
 
-document.addEventListener("click", (e) => {
-  // OPEN
-  const openBtn = e.target.closest("[data-open]");
-  if (openBtn) {
-    openWindow(openBtn.getAttribute("data-open"));
-    return;
-  }
+// ---------- Draggable System ----------
+let zIndexCounter = 100; // global z-index
 
-  // CLOSE (FIXED)
-  const closeBtn = e.target.closest(".close-btn");
-  if (closeBtn) {
-    const id = closeBtn.getAttribute("data-close");
-    closeWindow(id);
-  }
-});
 function makeDraggable(windowEl) {
-  const header = windowEl.querySelector(".titlebar");
+  const header = windowEl.querySelector(".window-titlebar");
   if (!header) return;
 
   let offsetX = 0;
@@ -35,9 +28,9 @@ function makeDraggable(windowEl) {
 
   function startDrag(e) {
     isDragging = true;
+    bringToFront(windowEl);
 
     const rect = windowEl.getBoundingClientRect();
-
     const clientX = e.touches ? e.touches[0].clientX : e.clientX;
     const clientY = e.touches ? e.touches[0].clientY : e.clientY;
 
@@ -69,3 +62,14 @@ function makeDraggable(windowEl) {
   document.addEventListener("touchmove", drag);
   document.addEventListener("touchend", stopDrag);
 }
+
+// Bring window to front
+function bringToFront(windowEl) {
+  zIndexCounter++;
+  windowEl.style.zIndex = zIndexCounter;
+}
+
+// Initialize all draggable windows on page load
+document.addEventListener("DOMContentLoaded", () => {
+  document.querySelectorAll(".appwindow").forEach(makeDraggable);
+});
