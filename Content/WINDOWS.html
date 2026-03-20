@@ -30,10 +30,21 @@
   </div>
   <iframe src="https://poki.com/" class="window-content" style="width: 100%; height:100%;"></iframe>
 </div>
+  <div id="crashViewer" class="appwindow hidden">
+  <div class="window-titlebar">
+    <span>Crash Viewer</span>
+    <button onclick="closeWindow('crashViewer')">✖</button>
+  </div>
+
+  <div id="crashList"></div>
+
+  <button onclick="clearCrashes()">Clear Logs</button>
+</div>
   <!-- DOCK -->
   <div class="dock glass">
     <button class="dock-icon" onclick="openWindow('myApp')">Calculator</button>
     <button class="dock-icon" onclick="openWindow('poki')">Poki</button>
+    <button class="dock-icon" onclick="openWindow('crashViewer')">Crashviewer</button>
   </div>
 
 </div>
