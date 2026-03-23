@@ -29,20 +29,9 @@ You can check it live here:
 
 ---
 
-## 🙌 Get Involved
-
-If you want to contribute:
-
-1. Fork this repository  
-2. Make your changes  
-3. Submit a pull request  
-
-Every contribution counts! 💡
-
----
-
 ## 🛠 Credits
 
 **Made with ❤️ by ShadowDev**
+**ShadowDev finished this project (almost)**
 
 </div>
