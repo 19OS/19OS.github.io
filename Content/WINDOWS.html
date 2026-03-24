@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="robots" content="noindex, nofollow"> <!-- Prevent search engines -->
+  <meta name="robots" content="noindex, nofollow">
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
@@ -14,7 +14,6 @@
 
 <body>
 <div id="desktop">
-
 <h2 class="title">19OS</h2>
 
 <!-- Calculator -->
@@ -25,10 +24,10 @@
   <div class="window-titlebar">
     <span>Calculator</span>
     <div class="window-controls">
-      <button onclick="closeWindow('myApp')">×</button>
+      <button class="closewin" data-target="myApp">×</button>
     </div>
   </div>
-  <iframe src="Apps/com.calc.app/Index.html" class="window-content" style="width:100%;height:100%;"></iframe>
+  <iframe src="Apps/com.calc.app/Index.html" class="window-content"></iframe>
 </div>
 
 <!-- Secret Lang -->
@@ -39,10 +38,10 @@
   <div class="window-titlebar">
     <span>Secret Lang</span>
     <div class="window-controls">
-      <button onclick="closeWindow('secret')">×</button>
+      <button class="closewin" data-target="secret">×</button>
     </div>
   </div>
-  <iframe src="Apps/com.os.secretlang/Index.html" class="window-content" style="width:100%;height:100%;"></iframe>
+  <iframe src="Apps/com.os.secretlang/Index.html" class="window-content"></iframe>
 </div>
 
 <!-- Poki -->
@@ -53,10 +52,10 @@
   <div class="window-titlebar">
     <span>Poki</span>
     <div class="window-controls">
-      <button onclick="closeWindow('poki')">×</button>
+      <button class="closewin" data-target="poki">×</button>
     </div>
   </div>
-  <iframe src="https://poki.com/" class="window-content" style="width:100%;height:100%;"></iframe>
+  <iframe src="https://poki.com/" class="window-content"></iframe>
 </div>
 
 <!-- Crash Viewer -->
@@ -67,7 +66,7 @@
   <div class="window-titlebar">
     <span>Crash Viewer</span>
     <div class="window-controls">
-      <button onclick="closeWindow('crashViewer')">×</button>
+      <button class="closewin" data-target="crashViewer">×</button>
     </div>
   </div>
   <div id="crashList"></div>
@@ -81,7 +80,6 @@
   <button onclick="openWindow('poki')">Poki</button>
   <button onclick="openWindow('crashViewer')">Crash</button>
 </div>
-
 </div>
 
 <script>
@@ -93,11 +91,10 @@ function bringToFront(el) {
   zIndexCounter++;
   el.style.zIndex = zIndexCounter;
 }
+
 // Disable F5, Ctrl+R, Cmd+R
 document.addEventListener('keydown', e => {
-  if (e.key === 'F5' || 
-      (e.ctrlKey && e.key === 'r') || 
-      (e.metaKey && e.key === 'r')) {
+  if (e.key === 'F5' || (e.ctrlKey && e.key === 'r') || (e.metaKey && e.key === 'r')) {
     e.preventDefault();
   }
 });
@@ -105,7 +102,7 @@ document.addEventListener('keydown', e => {
 // Warn user if they try to close or reload
 window.addEventListener('beforeunload', e => {
   e.preventDefault();
-  e.returnValue = ''; // Chrome requires returnValue to be set
+  e.returnValue = '';
 });
 
 // Prevent drag-and-drop navigation
@@ -113,23 +110,18 @@ window.addEventListener('dragover', e => e.preventDefault());
 window.addEventListener('drop', e => e.preventDefault());
 
 // ===============================
-// OPEN / CLOSE SYSTEM (NO RELOAD)
+// OPEN / CLOSE WINDOWS
 // ===============================
-/* ---------- OPEN / CLOSE WINDOWS ---------- */
 function openWindow(id) {
   const el = document.getElementById(id);
   if (!el) return;
-
-  // Make visible
   el.classList.remove("hidden");
   bringToFront(el);
 
-  // Ensure window is within viewport
+  // Keep window inside viewport
   const rect = el.getBoundingClientRect();
   const maxLeft = window.innerWidth - rect.width;
   const maxTop = window.innerHeight - rect.height;
-
-  // Adjust position if needed
   if (rect.left > maxLeft) el.style.left = Math.max(0, maxLeft) + "px";
   if (rect.top > maxTop) el.style.top = Math.max(0, maxTop) + "px";
 }
@@ -137,14 +129,19 @@ function openWindow(id) {
 function closeWindow(id) {
   const el = document.getElementById(id);
   if (!el) return;
-
   el.classList.add("hidden");
 }
 
-// ===============================
-// Z-INDEX SYSTEM
-// ===============================
-
+// -------------------------------
+// Close buttons with class 'closewin'
+document.addEventListener("DOMContentLoaded", () => {
+  document.querySelectorAll(".closewin").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const targetId = btn.dataset.target;
+      if (targetId) closeWindow(targetId);
+    });
+  });
+});
 
 // ===============================
 // DRAG SYSTEM
@@ -170,8 +167,19 @@ function makeDraggable(windowEl) {
 
   function drag(e) {
     if (!isDragging) return;
-    windowEl.style.left = (e.clientX - offsetX) + "px";
-    windowEl.style.top = (e.clientY - offsetY) + "px";
+
+    // Keep window inside viewport while dragging
+    const maxX = window.innerWidth - windowEl.offsetWidth;
+    const maxY = window.innerHeight - windowEl.offsetHeight;
+
+    let newLeft = e.clientX - offsetX;
+    let newTop = e.clientY - offsetY;
+
+    newLeft = Math.max(0, Math.min(newLeft, maxX));
+    newTop = Math.max(0, Math.min(newTop, maxY));
+
+    windowEl.style.left = newLeft + "px";
+    windowEl.style.top = newTop + "px";
   }
 
   function stopDrag() {
@@ -196,7 +204,6 @@ function makeResizable(windowEl) {
       const rect = windowEl.getBoundingClientRect();
       startX = e.clientX; startY = e.clientY;
       startW = rect.width; startH = rect.height;
-
       bringToFront(windowEl);
       document.addEventListener("pointermove", resize);
       document.addEventListener("pointerup", stopResize);
@@ -207,11 +214,14 @@ function makeResizable(windowEl) {
       const dx = e.clientX - startX;
       const dy = e.clientY - startY;
 
+      const maxWidth = window.innerWidth - windowEl.offsetLeft;
+      const maxHeight = window.innerHeight - windowEl.offsetTop;
+
       if (handle.classList.contains("resize-r") || handle.classList.contains("resize-br")) {
-        windowEl.style.width = Math.max(200, startW + dx) + "px";
+        windowEl.style.width = Math.max(200, Math.min(startW + dx, maxWidth)) + "px";
       }
       if (handle.classList.contains("resize-b") || handle.classList.contains("resize-br")) {
-        windowEl.style.height = Math.max(150, startH + dy) + "px";
+        windowEl.style.height = Math.max(150, Math.min(startH + dy, maxHeight)) + "px";
       }
     }
 
