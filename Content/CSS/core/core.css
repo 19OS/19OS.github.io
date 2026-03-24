@@ -11,6 +11,8 @@ body {
   color: var(--text-light);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  touch-action: none; /* Important for pointer events */
+  user-select: none;  /* Prevent text selection while dragging */
 }
 .hidden {
   display: none;
