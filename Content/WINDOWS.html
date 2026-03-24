@@ -11,75 +11,90 @@
 
   <h2 class="title">19OS</h2>
 
-  <!-- WINDOWS -->
+  <!-- ================= WINDOWS ================= -->
+
+  <!-- Calculator -->
   <div id="myApp" class="appwindow hidden">
-    <div class="resize-handle resize-br"></div> <!-- bottom right -->
-<div class="resize-handle resize-r"></div>  <!-- right -->
-<div class="resize-handle resize-b"></div>  <!-- bottom -->
-  <div class="window-titlebar">
-    <span>My App</span>
-    <div class="window-controls">
-      <button onclick="closeWindow('myApp')">×</button>
+    <div class="resize-handle resize-br"></div>
+    <div class="resize-handle resize-r"></div>
+    <div class="resize-handle resize-b"></div>
+
+    <div class="window-titlebar">
+      <span>Calculator</span>
+      <div class="window-controls">
+        <button class="win-btn close" data-action="close" data-window="myApp">×</button>
+      </div>
     </div>
+
+    <iframe src="Apps/com.calc.app/Index.html" class="window-content"></iframe>
   </div>
-  <iframe src="Apps/com.calc.app/Index.html" class="window-content" style="width: 100%; height:100%;"></iframe>
-</div>
+
+  <!-- Secret -->
   <div id="secret" class="appwindow hidden">
-    <div class="resize-handle resize-br"></div> <!-- bottom right -->
-<div class="resize-handle resize-r"></div>  <!-- right -->
-<div class="resize-handle resize-b"></div>  <!-- bottom -->
-  <div class="window-titlebar">
-    <span>My App</span>
-    <div class="window-controls">
-      <button onclick="closeWindow('myApp')">×</button>
+    <div class="resize-handle resize-br"></div>
+    <div class="resize-handle resize-r"></div>
+    <div class="resize-handle resize-b"></div>
+
+    <div class="window-titlebar">
+      <span>Secret Lang</span>
+      <div class="window-controls">
+        <button class="win-btn close" data-action="close" data-window="secret">×</button>
+      </div>
     </div>
+
+    <iframe src="Apps/com.os.secretlang/Index.html" class="window-content"></iframe>
   </div>
-  <iframe src="Apps/com.os.secretlang/Index.html" class="window-content" style="width: 100%; height:100%;"></iframe>
-</div>
+
+  <!-- Poki -->
   <div id="poki" class="appwindow hidden">
-    <div class="resize-handle resize-br"></div> <!-- bottom right -->
-<div class="resize-handle resize-r"></div>  <!-- right -->
-<div class="resize-handle resize-b"></div>  <!-- bottom -->
-  <div class="window-titlebar">
-    <span>My App</span>
-    <div class="window-controls">
-      <button onclick="closeWindow('poki')">×</button>
+    <div class="resize-handle resize-br"></div>
+    <div class="resize-handle resize-r"></div>
+    <div class="resize-handle resize-b"></div>
+
+    <div class="window-titlebar">
+      <span>Poki</span>
+      <div class="window-controls">
+        <button class="win-btn close" data-action="close" data-window="poki">×</button>
+      </div>
     </div>
+
+    <iframe src="https://poki.com/" class="window-content"></iframe>
   </div>
-  <iframe src="https://poki.com/" class="window-content" style="width: 100%; height:100%;"></iframe>
-</div>
+
+  <!-- Crash Viewer -->
   <div id="crashViewer" class="appwindow hidden">
-    <div class="resize-handle resize-br"></div> <!-- bottom right -->
-<div class="resize-handle resize-r"></div>  <!-- right -->
-<div class="resize-handle resize-b"></div>  <!-- bottom -->
-  <div class="window-titlebar">
-    <span>Crash Viewer</span>
-    <button onclick="closeWindow('crashViewer')">✖</button>
+    <div class="resize-handle resize-br"></div>
+    <div class="resize-handle resize-r"></div>
+    <div class="resize-handle resize-b"></div>
+
+    <div class="window-titlebar">
+      <span>Crash Viewer</span>
+      <div class="window-controls">
+        <button class="win-btn close" data-action="close" data-window="crashViewer">✖</button>
+      </div>
+    </div>
+
+    <div id="crashList"></div>
+    <button onclick="clearCrashes()">Clear Logs</button>
   </div>
 
-  <div id="crashList"></div>
-
-  <button onclick="clearCrashes()">Clear Logs</button>
-</div>
-  <!-- DOCK -->
+  <!-- ================= DOCK ================= -->
   <div class="dock glass">
     <button class="dock-icon" onclick="openWindow('myApp')">Calculator</button>
-     <button class="dock-icon" onclick="openWindow('secret')">Secret Lang</button>
+    <button class="dock-icon" onclick="openWindow('secret')">Secret</button>
     <button class="dock-icon" onclick="openWindow('poki')">Poki</button>
-    <button class="dock-icon" onclick="openWindow('crashViewer')">Crashviewer</button>
+    <button class="dock-icon" onclick="openWindow('crashViewer')">Crash</button>
   </div>
 
 </div>
 
 <script>
-  // ===============================
-// 19OS WINDOW SYSTEM (FULL)
 // ===============================
-
-// ---------- Open / Close ----------
+// OPEN / CLOSE
+// ===============================
 function openWindow(id) {
   const el = document.getElementById(id);
-  if (!el) return console.warn("Window not found:", id);
+  if (!el) return;
 
   el.classList.remove("hidden");
   el.style.display = "block";
@@ -89,22 +104,24 @@ function openWindow(id) {
 
 function closeWindow(id) {
   const el = document.getElementById(id);
-  if (!el) return console.warn("Window not found:", id);
+  if (!el) return;
 
   el.classList.add("hidden");
   el.style.display = "none";
 }
 
-// ---------- Z-Index System ----------
+// ===============================
+// Z-INDEX
+// ===============================
 let zIndexCounter = 100;
 
-function bringToFront(windowEl) {
+function bringToFront(el) {
   zIndexCounter++;
-  windowEl.style.zIndex = zIndexCounter;
+  el.style.zIndex = zIndexCounter;
 }
 
 // ===============================
-// DRAG SYSTEM (ULTRA SMOOTH)
+// DRAG SYSTEM (FIXED)
 // ===============================
 function makeDraggable(windowEl) {
   const header = windowEl.querySelector(".window-titlebar");
@@ -114,197 +131,126 @@ function makeDraggable(windowEl) {
   let offsetX = 0;
   let offsetY = 0;
 
-  let targetX = 0;
-  let targetY = 0;
-
-  let currentX = 0;
-  let currentY = 0;
-
-  let rafId = null;
-
-  function getPos(e) {
-    return e.touches
-      ? { x: e.touches[0].clientX, y: e.touches[0].clientY }
-      : { x: e.clientX, y: e.clientY };
-  }
-
   function startDrag(e) {
-    e.preventDefault();
-    isDragging = true;
+    // 🚫 prevent dragging when clicking buttons
+    if (e.target.closest(".window-controls")) return;
 
+    isDragging = true;
     bringToFront(windowEl);
 
     const rect = windowEl.getBoundingClientRect();
-    const pos = getPos(e);
+    offsetX = e.clientX - rect.left;
+    offsetY = e.clientY - rect.top;
 
-    offsetX = pos.x - rect.left;
-    offsetY = pos.y - rect.top;
-
-    document.addEventListener("mousemove", drag);
-    document.addEventListener("mouseup", stopDrag);
-    document.addEventListener("touchmove", drag, { passive: false });
-    document.addEventListener("touchend", stopDrag);
+    document.addEventListener("pointermove", drag);
+    document.addEventListener("pointerup", stopDrag);
   }
 
   function drag(e) {
     if (!isDragging) return;
-    e.preventDefault();
 
-    const pos = getPos(e);
-
-    targetX = pos.x - offsetX;
-    targetY = pos.y - offsetY;
-
-    if (!rafId) rafId = requestAnimationFrame(updatePosition);
-  }
-
-  function updatePosition() {
-    currentX = targetX;
-    currentY = targetY;
-
-    windowEl.style.transform = `translate3d(${currentX}px, ${currentY}px, 0)`;
-
-    rafId = null;
+    windowEl.style.left = (e.clientX - offsetX) + "px";
+    windowEl.style.top = (e.clientY - offsetY) + "px";
   }
 
   function stopDrag() {
     isDragging = false;
-
-    document.removeEventListener("mousemove", drag);
-    document.removeEventListener("mouseup", stopDrag);
-    document.removeEventListener("touchmove", drag);
-    document.removeEventListener("touchend", stopDrag);
+    document.removeEventListener("pointermove", drag);
+    document.removeEventListener("pointerup", stopDrag);
   }
 
-  header.addEventListener("mousedown", startDrag);
-  header.addEventListener("touchstart", startDrag, { passive: false });
+  header.addEventListener("pointerdown", startDrag);
 }
 
 // ===============================
-// RESIZE SYSTEM (SMOOTH)
+// RESIZE SYSTEM (POINTER)
 // ===============================
 function makeResizable(windowEl) {
   const handles = windowEl.querySelectorAll(".resize-handle");
 
   handles.forEach(handle => {
     let isResizing = false;
-
-    let startX, startY;
-    let startWidth, startHeight;
-
-    let targetWidth, targetHeight;
-    let rafId = null;
-
-    function getPos(e) {
-      return e.touches
-        ? { x: e.touches[0].clientX, y: e.touches[0].clientY }
-        : { x: e.clientX, y: e.clientY };
-    }
+    let startX, startY, startW, startH;
 
     function startResize(e) {
-      e.preventDefault();
       isResizing = true;
 
-      bringToFront(windowEl);
-
       const rect = windowEl.getBoundingClientRect();
-      const pos = getPos(e);
+      startX = e.clientX;
+      startY = e.clientY;
+      startW = rect.width;
+      startH = rect.height;
 
-      startX = pos.x;
-      startY = pos.y;
-
-      startWidth = rect.width;
-      startHeight = rect.height;
-
-      document.addEventListener("mousemove", resize);
-      document.addEventListener("mouseup", stopResize);
-      document.addEventListener("touchmove", resize, { passive: false });
-      document.addEventListener("touchend", stopResize);
+      document.addEventListener("pointermove", resize);
+      document.addEventListener("pointerup", stopResize);
     }
 
     function resize(e) {
       if (!isResizing) return;
-      e.preventDefault();
 
-      const pos = getPos(e);
-
-      const dx = pos.x - startX;
-      const dy = pos.y - startY;
+      let dx = e.clientX - startX;
+      let dy = e.clientY - startY;
 
       if (handle.classList.contains("resize-r") || handle.classList.contains("resize-br")) {
-        targetWidth = startWidth + dx;
+        windowEl.style.width = Math.max(200, startW + dx) + "px";
       }
 
       if (handle.classList.contains("resize-b") || handle.classList.contains("resize-br")) {
-        targetHeight = startHeight + dy;
+        windowEl.style.height = Math.max(150, startH + dy) + "px";
       }
-
-      if (!rafId) rafId = requestAnimationFrame(applyResize);
-    }
-
-    function applyResize() {
-      const minWidth = 200;
-      const minHeight = 150;
-
-      if (targetWidth !== undefined) {
-        windowEl.style.width = Math.max(minWidth, targetWidth) + "px";
-      }
-
-      if (targetHeight !== undefined) {
-        windowEl.style.height = Math.max(minHeight, targetHeight) + "px";
-      }
-
-      rafId = null;
     }
 
     function stopResize() {
       isResizing = false;
-
-      document.removeEventListener("mousemove", resize);
-      document.removeEventListener("mouseup", stopResize);
-      document.removeEventListener("touchmove", resize);
-      document.removeEventListener("touchend", stopResize);
+      document.removeEventListener("pointermove", resize);
+      document.removeEventListener("pointerup", stopResize);
     }
 
-    handle.addEventListener("mousedown", startResize);
-    handle.addEventListener("touchstart", startResize, { passive: false });
+    handle.addEventListener("pointerdown", startResize);
   });
 }
 
 // ===============================
-// INIT SYSTEM
+// BUTTON FIX (CRITICAL)
+// ===============================
+function initButtons() {
+  document.querySelectorAll(".win-btn").forEach(btn => {
+    btn.addEventListener("pointerdown", e => e.stopPropagation());
+
+    btn.addEventListener("click", e => {
+      e.stopPropagation();
+
+      const action = btn.dataset.action;
+      const id = btn.dataset.window;
+
+      if (action === "close") closeWindow(id);
+    });
+  });
+}
+
+// ===============================
+// INIT
 // ===============================
 document.addEventListener("DOMContentLoaded", () => {
   document.querySelectorAll(".appwindow").forEach(win => {
     makeDraggable(win);
     makeResizable(win);
   });
+
+  initButtons();
 });
 </script>
-  <script src="js/crashlogger.js"></script>
-  <script>
-    function openCrashViewer() {
-  openWindow("crashViewer");
-  renderCrashLogs();
-}
 
+<script src="js/crashlogger.js"></script>
+
+<script>
 function renderCrashLogs() {
   const list = document.getElementById("crashList");
   list.innerHTML = "";
 
   CrashLogger.logs.forEach(log => {
     const item = document.createElement("div");
-    item.className = "crash-item";
-
-    item.innerHTML = `
-      <b>${log.source}</b> - ${log.time}<br>
-      ${log.message}
-      <details>
-        <summary>Stack</summary>
-        <pre>${log.stack}</pre>
-      </details>
-    `;
-
+    item.innerHTML = `<b>${log.source}</b> - ${log.time}<br>${log.message}`;
     list.appendChild(item);
   });
 }
@@ -313,6 +259,7 @@ function clearCrashes() {
   CrashLogger.clear();
   renderCrashLogs();
 }
-  </script>
+</script>
+
 </body>
 </html>
