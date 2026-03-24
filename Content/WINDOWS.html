@@ -88,7 +88,11 @@
 // ===============================
 // PREVENT PAGE RELOAD / NAVIGATION
 // ===============================
-
+let zIndexCounter = 100;
+function bringToFront(el) {
+  zIndexCounter++;
+  el.style.zIndex = zIndexCounter;
+}
 // Disable F5, Ctrl+R, Cmd+R
 document.addEventListener('keydown', e => {
   if (e.key === 'F5' || 
@@ -111,27 +115,36 @@ window.addEventListener('drop', e => e.preventDefault());
 // ===============================
 // OPEN / CLOSE SYSTEM (NO RELOAD)
 // ===============================
+/* ---------- OPEN / CLOSE WINDOWS ---------- */
 function openWindow(id) {
   const el = document.getElementById(id);
   if (!el) return;
+
+  // Make visible
   el.classList.remove("hidden");
   bringToFront(el);
+
+  // Ensure window is within viewport
+  const rect = el.getBoundingClientRect();
+  const maxLeft = window.innerWidth - rect.width;
+  const maxTop = window.innerHeight - rect.height;
+
+  // Adjust position if needed
+  if (rect.left > maxLeft) el.style.left = Math.max(0, maxLeft) + "px";
+  if (rect.top > maxTop) el.style.top = Math.max(0, maxTop) + "px";
 }
 
 function closeWindow(id) {
   const el = document.getElementById(id);
   if (!el) return;
+
   el.classList.add("hidden");
 }
 
 // ===============================
 // Z-INDEX SYSTEM
 // ===============================
-let zIndexCounter = 100;
-function bringToFront(el) {
-  zIndexCounter++;
-  el.style.zIndex = zIndexCounter;
-}
+
 
 // ===============================
 // DRAG SYSTEM
