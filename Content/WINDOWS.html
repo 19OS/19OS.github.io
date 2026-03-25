@@ -1,318 +1,360 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>19OS</title>
   <link rel="stylesheet" href="CSS/main.css">
+  <style>
+    /* ===========================
+       Liquid Glass Style
+       =========================== */
+    .glass {
+      background: rgba(255,255,255,0.1);
+      backdrop-filter: blur(20px) saturate(1.2);
+      border: 1px solid rgba(255,255,255,0.2);
+      box-shadow: 0 4px 30px rgba(0,0,0,0.1);
+      border-radius: 12px;
+      transition: all 0.2s ease;
+    }
+
+    body, html {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      font-family: sans-serif;
+      background: linear-gradient(120deg, #4a90e2, #50e3c2);
+    }
+
+    #desktop {
+      width: 100%;
+      height: 100%;
+      position: relative;
+    }
+
+    .title {
+      text-align: center;
+      color: white;
+      margin: 12px 0;
+      text-shadow: 0 2px 6px rgba(0,0,0,0.5);
+    }
+
+    .appwindow {
+      position: absolute;
+      width: 400px;
+      height: 300px;
+      border-radius: 12px;
+      overflow: hidden;
+      display: none;
+      flex-direction: column;
+      background: rgba(255,255,255,0.1);
+      backdrop-filter: blur(20px) saturate(1.2);
+      border: 1px solid rgba(255,255,255,0.2);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+    }
+
+    .window-titlebar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 6px 12px;
+      background: rgba(255,255,255,0.05);
+      cursor: grab;
+      user-select: none;
+    }
+
+    .window-controls button {
+      background: rgba(255,255,255,0.2);
+      border: none;
+      border-radius: 4px;
+      padding: 2px 6px;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    .window-content {
+      flex: 1;
+      border: none;
+    }
+
+    .resize-handle {
+      position: absolute;
+      width: 12px;
+      height: 12px;
+      background: rgba(255,255,255,0.3);
+      border-radius: 50%;
+      z-index: 10;
+      cursor: nwse-resize;
+    }
+
+    .resize-br {
+      bottom: 4px;
+      right: 4px;
+    }
+
+    .resize-r {
+      right: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 6px;
+      height: 100%;
+      cursor: ew-resize;
+      border-radius: 0;
+    }
+
+    .resize-b {
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100%;
+      height: 6px;
+      cursor: ns-resize;
+      border-radius: 0;
+    }
+
+    
+
+    /* subtle floating animation for glass effect */
+    .glass-float {
+      animation: floatGlass 6s ease-in-out infinite;
+    }
+
+    @keyframes floatGlass {
+      0%,100% { transform: translateY(0) }
+      50% { transform: translateY(-6px) }
+    }
+
+    .hidden { display: none; }
+  </style>
 </head>
 
 <body>
-<div id="desktop">
+  <div id="desktop">
+    <h2 class="title">19OS</h2>
 
-  <h2 class="title">19OS</h2>
+    <!-- WINDOWS -->
+    <div id="myApp" class="appwindow glass glass-float hidden">
+      <div class="resize-handle resize-br"></div>
+      <div class="resize-handle resize-r"></div>
+      <div class="resize-handle resize-b"></div>
+      <div class="window-titlebar">
+        <span>Calculator</span>
+        <div class="window-controls">
+          <button onclick="closeWindow('myApp')">×</button>
+        </div>
+      </div>
+      <iframe src="Apps/com.calc.app/Index.html" class="window-content"></iframe>
+    </div>
 
-  <!-- WINDOWS -->
-  <div id="myApp" class="appwindow hidden">
-    <div class="resize-handle resize-br"></div> <!-- bottom right -->
-<div class="resize-handle resize-r"></div>  <!-- right -->
-<div class="resize-handle resize-b"></div>  <!-- bottom -->
-  <div class="window-titlebar">
-    <span>My App</span>
-    <div class="window-controls">
-      <button onclick="closeWindow('myApp')">×</button>
+    <div id="secret" class="appwindow glass glass-float hidden">
+      <div class="resize-handle resize-br"></div>
+      <div class="resize-handle resize-r"></div>
+      <div class="resize-handle resize-b"></div>
+      <div class="window-titlebar">
+        <span>Secret Lang</span>
+        <div class="window-controls">
+          <button onclick="closeWindow('secret')">×</button>
+        </div>
+      </div>
+      <iframe src="Apps/com.os.secretlang/Index.html" class="window-content"></iframe>
+    </div>
+
+    <div id="poki" class="appwindow glass glass-float hidden">
+      <div class="resize-handle resize-br"></div>
+      <div class="resize-handle resize-r"></div>
+      <div class="resize-handle resize-b"></div>
+      <div class="window-titlebar">
+        <span>Poki</span>
+        <div class="window-controls">
+          <button onclick="closeWindow('poki')">×</button>
+        </div>
+      </div>
+      <iframe src="https://poki.com/" class="window-content"></iframe>
+    </div>
+
+    <div id="crashViewer" class="appwindow glass glass-float hidden">
+      <div class="resize-handle resize-br"></div>
+      <div class="resize-handle resize-r"></div>
+      <div class="resize-handle resize-b"></div>
+      <div class="window-titlebar">
+        <span>Crash Viewer</span>
+        <button onclick="closeWindow('crashViewer')">✖</button>
+      </div>
+      <div id="crashList"></div>
+      <button onclick="clearCrashes()">Clear Logs</button>
+    </div>
+
+    <!-- DOCK -->
+    <div class="dock glass glass-float">
+      <button class="dock-icon" onclick="openWindow('myApp')">Calc</button>
+      <button class="dock-icon" onclick="openWindow('secret')">Secret</button>
+      <button class="dock-icon" onclick="openWindow('poki')">Poki</button>
+      <button class="dock-icon" onclick="openWindow('crashViewer')">Crashes</button>
     </div>
   </div>
-  <iframe src="Apps/com.calc.app/Index.html" class="window-content" style="width: 100%; height:100%;"></iframe>
-</div>
-  <div id="secret" class="appwindow hidden">
-    <div class="resize-handle resize-br"></div> <!-- bottom right -->
-<div class="resize-handle resize-r"></div>  <!-- right -->
-<div class="resize-handle resize-b"></div>  <!-- bottom -->
-  <div class="window-titlebar">
-    <span>My App</span>
-    <div class="window-controls">
-      <button onclick="closeWindow('myApp')">×</button>
-    </div>
-  </div>
-  <iframe src="Apps/com.os.secretlang/Index.html" class="window-content" style="width: 100%; height:100%;"></iframe>
-</div>
-  <div id="poki" class="appwindow hidden">
-    <div class="resize-handle resize-br"></div> <!-- bottom right -->
-<div class="resize-handle resize-r"></div>  <!-- right -->
-<div class="resize-handle resize-b"></div>  <!-- bottom -->
-  <div class="window-titlebar">
-    <span>My App</span>
-    <div class="window-controls">
-      <button onclick="closeWindow('poki')">×</button>
-    </div>
-  </div>
-  <iframe src="https://poki.com/" class="window-content" style="width: 100%; height:100%;"></iframe>
-</div>
-  <div id="crashViewer" class="appwindow hidden">
-    <div class="resize-handle resize-br"></div> <!-- bottom right -->
-<div class="resize-handle resize-r"></div>  <!-- right -->
-<div class="resize-handle resize-b"></div>  <!-- bottom -->
-  <div class="window-titlebar">
-    <span>Crash Viewer</span>
-    <button onclick="closeWindow('crashViewer')">✖</button>
-  </div>
 
-  <div id="crashList"></div>
-
-  <button onclick="clearCrashes()">Clear Logs</button>
-</div>
-  <!-- DOCK -->
-  <div class="dock glass">
-    <button class="dock-icon" onclick="openWindow('myApp')">Calculator</button>
-     <button class="dock-icon" onclick="openWindow('secret')">Secret Lang</button>
-    <button class="dock-icon" onclick="openWindow('poki')">Poki</button>
-    <button class="dock-icon" onclick="openWindow('crashViewer')">Crashviewer</button>
-  </div>
-
-</div>
-
-<script>
-  // ===============================
-// 19OS WINDOW SYSTEM (FULL)
-// ===============================
-
-// ---------- Open / Close ----------
-function openWindow(id) {
-  const el = document.getElementById(id);
-  if (!el) return console.warn("Window not found:", id);
-
-  el.classList.remove("hidden");
-  el.style.display = "block";
-
-  bringToFront(el);
-}
-
-function closeWindow(id) {
-  const el = document.getElementById(id);
-  if (!el) return console.warn("Window not found:", id);
-
-  el.classList.add("hidden");
-  el.style.display = "none";
-}
-
-// ---------- Z-Index System ----------
-let zIndexCounter = 100;
-
-function bringToFront(windowEl) {
-  zIndexCounter++;
-  windowEl.style.zIndex = zIndexCounter;
-}
-
-// ===============================
-// DRAG SYSTEM (ULTRA SMOOTH)
-// ===============================
-function makeDraggable(windowEl) {
-  const header = windowEl.querySelector(".window-titlebar");
-  if (!header) return;
-
-  let isDragging = false;
-  let offsetX = 0;
-  let offsetY = 0;
-
-  let targetX = 0;
-  let targetY = 0;
-
-  let currentX = 0;
-  let currentY = 0;
-
-  let rafId = null;
-
-  function getPos(e) {
-    return e.touches
-      ? { x: e.touches[0].clientX, y: e.touches[0].clientY }
-      : { x: e.clientX, y: e.clientY };
-  }
-
-  function startDrag(e) {
-    e.preventDefault();
-    isDragging = true;
-
-    bringToFront(windowEl);
-
-    const rect = windowEl.getBoundingClientRect();
-    const pos = getPos(e);
-
-    offsetX = pos.x - rect.left;
-    offsetY = pos.y - rect.top;
-
-    document.addEventListener("mousemove", drag);
-    document.addEventListener("mouseup", stopDrag);
-    document.addEventListener("touchmove", drag, { passive: false });
-    document.addEventListener("touchend", stopDrag);
-  }
-
-  function drag(e) {
-    if (!isDragging) return;
-    e.preventDefault();
-
-    const pos = getPos(e);
-
-    targetX = pos.x - offsetX;
-    targetY = pos.y - offsetY;
-
-    if (!rafId) rafId = requestAnimationFrame(updatePosition);
-  }
-
-  function updatePosition() {
-    currentX = targetX;
-    currentY = targetY;
-
-    windowEl.style.transform = `translate3d(${currentX}px, ${currentY}px, 0)`;
-
-    rafId = null;
-  }
-
-  function stopDrag() {
-    isDragging = false;
-
-    document.removeEventListener("mousemove", drag);
-    document.removeEventListener("mouseup", stopDrag);
-    document.removeEventListener("touchmove", drag);
-    document.removeEventListener("touchend", stopDrag);
-  }
-
-  header.addEventListener("mousedown", startDrag);
-  header.addEventListener("touchstart", startDrag, { passive: false });
-}
-
-// ===============================
-// RESIZE SYSTEM (SMOOTH)
-// ===============================
-function makeResizable(windowEl) {
-  const handles = windowEl.querySelectorAll(".resize-handle");
-
-  handles.forEach(handle => {
-    let isResizing = false;
-
-    let startX, startY;
-    let startWidth, startHeight;
-
-    let targetWidth, targetHeight;
-    let rafId = null;
-
-    function getPos(e) {
-      return e.touches
-        ? { x: e.touches[0].clientX, y: e.touches[0].clientY }
-        : { x: e.clientX, y: e.clientY };
-    }
-
-    function startResize(e) {
-      e.preventDefault();
-      isResizing = true;
-
-      bringToFront(windowEl);
-
-      const rect = windowEl.getBoundingClientRect();
-      const pos = getPos(e);
-
-      startX = pos.x;
-      startY = pos.y;
-
-      startWidth = rect.width;
-      startHeight = rect.height;
-
-      document.addEventListener("mousemove", resize);
-      document.addEventListener("mouseup", stopResize);
-      document.addEventListener("touchmove", resize, { passive: false });
-      document.addEventListener("touchend", stopResize);
-    }
-
-    function resize(e) {
-      if (!isResizing) return;
-      e.preventDefault();
-
-      const pos = getPos(e);
-
-      const dx = pos.x - startX;
-      const dy = pos.y - startY;
-
-      if (handle.classList.contains("resize-r") || handle.classList.contains("resize-br")) {
-        targetWidth = startWidth + dx;
-      }
-
-      if (handle.classList.contains("resize-b") || handle.classList.contains("resize-br")) {
-        targetHeight = startHeight + dy;
-      }
-
-      if (!rafId) rafId = requestAnimationFrame(applyResize);
-    }
-
-    function applyResize() {
-      const minWidth = 200;
-      const minHeight = 150;
-
-      if (targetWidth !== undefined) {
-        windowEl.style.width = Math.max(minWidth, targetWidth) + "px";
-      }
-
-      if (targetHeight !== undefined) {
-        windowEl.style.height = Math.max(minHeight, targetHeight) + "px";
-      }
-
-      rafId = null;
-    }
-
-    function stopResize() {
-      isResizing = false;
-
-      document.removeEventListener("mousemove", resize);
-      document.removeEventListener("mouseup", stopResize);
-      document.removeEventListener("touchmove", resize);
-      document.removeEventListener("touchend", stopResize);
-    }
-
-    handle.addEventListener("mousedown", startResize);
-    handle.addEventListener("touchstart", startResize, { passive: false });
-  });
-}
-
-// ===============================
-// INIT SYSTEM
-// ===============================
-document.addEventListener("DOMContentLoaded", () => {
-  document.querySelectorAll(".appwindow").forEach(win => {
-    makeDraggable(win);
-    makeResizable(win);
-  });
-});
-</script>
-  <script src="js/crashlogger.js"></script>
+  <!-- ==============================
+       19OS WINDOW SYSTEM
+       ============================== -->
   <script>
-    function openCrashViewer() {
-  openWindow("crashViewer");
-  renderCrashLogs();
-}
+    // ---------- Open / Close ----------
+    let zIndexCounter = 100;
+    function bringToFront(win){ zIndexCounter++; win.style.zIndex = zIndexCounter; }
 
-function renderCrashLogs() {
-  const list = document.getElementById("crashList");
-  list.innerHTML = "";
+    function openWindow(id) {
+      const el = document.getElementById(id);
+      if (!el) return console.warn("Window not found:", id);
+      el.classList.remove("hidden");
+      el.style.display = "flex";
+      el.style.transform = "translate3d(0,0,0)";
+      bringToFront(el);
 
-  CrashLogger.logs.forEach(log => {
-    const item = document.createElement("div");
-    item.className = "crash-item";
+      if (id === "crashViewer") renderCrashLogs();
+    }
 
-    item.innerHTML = `
-      <b>${log.source}</b> - ${log.time}<br>
-      ${log.message}
-      <details>
-        <summary>Stack</summary>
-        <pre>${log.stack}</pre>
-      </details>
-    `;
+    function closeWindow(id) {
+      const el = document.getElementById(id);
+      if (!el) return console.warn("Window not found:", id);
+      el.classList.add("hidden");
+      el.style.display = "none";
+    }
 
-    list.appendChild(item);
-  });
-}
+    // ---------- Drag ----------
+    function makeDraggable(win) {
+      const header = win.querySelector(".window-titlebar");
+      if (!header) return;
 
-function clearCrashes() {
-  CrashLogger.clear();
-  renderCrashLogs();
-}
+      let isDragging = false, offsetX=0, offsetY=0;
+      let targetX=0, targetY=0, currentX=0, currentY=0;
+      let rafId=null;
+
+      function getPos(e){ return e.touches? {x:e.touches[0].clientX, y:e.touches[0].clientY} : {x:e.clientX, y:e.clientY}; }
+
+      function startDrag(e){
+        e.preventDefault();
+        isDragging=true;
+        bringToFront(win);
+        const rect=win.getBoundingClientRect();
+        const pos=getPos(e);
+        offsetX = pos.x - rect.left;
+        offsetY = pos.y - rect.top;
+
+        document.addEventListener("mousemove", drag);
+        document.addEventListener("mouseup", stopDrag);
+        document.addEventListener("touchmove", drag, {passive:false});
+        document.addEventListener("touchend", stopDrag);
+      }
+
+      function drag(e){
+        if(!isDragging) return;
+        e.preventDefault();
+        const pos=getPos(e);
+        targetX = pos.x - offsetX;
+        targetY = pos.y - offsetY;
+        if(!rafId) rafId = requestAnimationFrame(updatePosition);
+      }
+
+      function updatePosition(){
+        currentX = targetX; currentY = targetY;
+        win.style.transform = `translate3d(${currentX}px,${currentY}px,0)`;
+        rafId = null;
+      }
+
+      function stopDrag(){
+        isDragging=false;
+        document.removeEventListener("mousemove", drag);
+        document.removeEventListener("mouseup", stopDrag);
+        document.removeEventListener("touchmove", drag);
+        document.removeEventListener("touchend", stopDrag);
+      }
+
+      header.addEventListener("mousedown", startDrag);
+      header.addEventListener("touchstart", startDrag, {passive:false});
+    }
+
+    // ---------- Resize ----------
+    function makeResizable(win){
+      const handles = win.querySelectorAll(".resize-handle");
+      handles.forEach(handle=>{
+        let isResizing=false, startX, startY, startW, startH, targetW, targetH, rafId=null;
+
+        function getPos(e){ return e.touches? {x:e.touches[0].clientX, y:e.touches[0].clientY} : {x:e.clientX, y:e.clientY}; }
+
+        function startResize(e){
+          e.preventDefault();
+          isResizing=true;
+          bringToFront(win);
+          const rect=win.getBoundingClientRect();
+          const pos=getPos(e);
+          startX=pos.x; startY=pos.y;
+          startW=rect.width; startH=rect.height;
+
+          document.addEventListener("mousemove", resize);
+          document.addEventListener("mouseup", stopResize);
+          document.addEventListener("touchmove", resize, {passive:false});
+          document.addEventListener("touchend", stopResize);
+        }
+
+        function resize(e){
+          if(!isResizing) return;
+          e.preventDefault();
+          const pos=getPos(e);
+          const dx=pos.x-startX, dy=pos.y-startY;
+
+          if(handle.classList.contains("resize-r") || handle.classList.contains("resize-br")) targetW = startW+dx;
+          if(handle.classList.contains("resize-b") || handle.classList.contains("resize-br")) targetH = startH+dy;
+
+          if(!rafId) rafId = requestAnimationFrame(applyResize);
+        }
+
+        function applyResize(){
+          if(targetW!==undefined) win.style.width = Math.max(0,targetW)+"px";
+          if(targetH!==undefined) win.style.height = Math.max(0,targetH)+"px";
+          rafId=null;
+        }
+
+        function stopResize(){
+          isResizing=false;
+          document.removeEventListener("mousemove", resize);
+          document.removeEventListener("mouseup", stopResize);
+          document.removeEventListener("touchmove", resize);
+          document.removeEventListener("touchend", stopResize);
+        }
+
+        handle.addEventListener("mousedown", startResize);
+        handle.addEventListener("touchstart", startResize, {passive:false});
+      });
+    }
+
+    document.addEventListener("DOMContentLoaded", ()=>{
+      document.querySelectorAll(".appwindow").forEach(win=>{
+        makeDraggable(win);
+        makeResizable(win);
+      });
+    });
+
+    // ---------------- Crash Logger ----------------
+    const CrashLogger = {
+      logs: [],
+      add(log){ this.logs.push({...log,time:new Date().toLocaleTimeString()}); },
+      clear(){ this.logs=[]; }
+    };
+
+    function renderCrashLogs(){
+      const list = document.getElementById("crashList");
+      list.innerHTML="";
+      CrashLogger.logs.forEach(log=>{
+        const item=document.createElement("div");
+        item.className="crash-item";
+        item.innerHTML=`<b>${log.source}</b> - ${log.time}<br>${log.message}
+        <details><summary>Stack</summary><pre>${log.stack}</pre></details>`;
+        list.appendChild(item);
+      });
+    }
+
+    function clearCrashes(){ CrashLogger.clear(); renderCrashLogs(); }
   </script>
 </body>
 </html>
