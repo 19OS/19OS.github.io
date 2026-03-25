@@ -84,151 +84,158 @@
 
 <script>
 // ===============================
-// PREVENT PAGE RELOAD / NAVIGATION
+// SPRING PHYSICS ENGINE
 // ===============================
-let zIndexCounter = 100;
-function bringToFront(el) {
-  zIndexCounter++;
-  el.style.zIndex = zIndexCounter;
+function createSpring(initial) {
+  return {
+    value: initial,
+    velocity: 0,
+    target: initial
+  };
 }
 
-// Disable F5, Ctrl+R, Cmd+R
-document.addEventListener('keydown', e => {
-  if (e.key === 'F5' || (e.ctrlKey && e.key === 'r') || (e.metaKey && e.key === 'r')) {
-    e.preventDefault();
-  }
-});
-
-// Warn user if they try to close or reload
-window.addEventListener('beforeunload', e => {
-  e.preventDefault();
-  e.returnValue = '';
-});
-
-// Prevent drag-and-drop navigation
-window.addEventListener('dragover', e => e.preventDefault());
-window.addEventListener('drop', e => e.preventDefault());
-
-// ===============================
-// OPEN / CLOSE WINDOWS
-// ===============================
-function openWindow(id) {
-  const el = document.getElementById(id);
-  if (!el) return;
-  el.classList.remove("hidden");
-  bringToFront(el);
-
-  // Keep window inside viewport
-  const rect = el.getBoundingClientRect();
-  const maxLeft = window.innerWidth - rect.width;
-  const maxTop = window.innerHeight - rect.height;
-  if (rect.left > maxLeft) el.style.left = Math.max(0, maxLeft) + "px";
-  if (rect.top > maxTop) el.style.top = Math.max(0, maxTop) + "px";
+function updateSpring(spring, stiffness = 0.12, damping = 0.75) {
+  const force = (spring.target - spring.value) * stiffness;
+  spring.velocity += force;
+  spring.velocity *= damping;
+  spring.value += spring.velocity;
 }
 
-function closeWindow(id) {
-  const el = document.getElementById(id);
-  if (!el) return;
-  el.classList.add("hidden");
-}
-
-// -------------------------------
-// Close buttons with class 'closewin'
-document.addEventListener("DOMContentLoaded", () => {
-  document.querySelectorAll(".closewin").forEach(btn => {
-    btn.addEventListener("click", () => {
-      const targetId = btn.dataset.target;
-      if (targetId) closeWindow(targetId);
-    });
-  });
-});
-
 // ===============================
-// DRAG SYSTEM
+// DRAG WITH JIGGLE
 // ===============================
-function makeDraggable(windowEl) {
-  const header = windowEl.querySelector(".window-titlebar");
+function makeDraggable(win) {
+  const header = win.querySelector(".window-titlebar");
   if (!header) return;
-  let isDragging = false;
+
+  const rect = win.getBoundingClientRect();
+
+  let x = createSpring(rect.left);
+  let y = createSpring(rect.top);
+
+  let dragging = false;
   let offsetX = 0, offsetY = 0;
 
   header.addEventListener("pointerdown", e => {
-    if (e.target.closest(".window-controls") || e.target.tagName === "BUTTON") return;
-    isDragging = true;
-    bringToFront(windowEl);
+    if (e.target.closest(".window-controls")) return;
 
-    const rect = windowEl.getBoundingClientRect();
-    offsetX = e.clientX - rect.left;
-    offsetY = e.clientY - rect.top;
+    dragging = true;
+    const r = win.getBoundingClientRect();
 
-    document.addEventListener("pointermove", drag);
-    document.addEventListener("pointerup", stopDrag);
+    offsetX = e.clientX - r.left;
+    offsetY = e.clientY - r.top;
+
+    x.target = r.left;
+    y.target = r.top;
+
+    win.setPointerCapture(e.pointerId);
+    requestAnimationFrame(loop);
   });
 
-  function drag(e) {
-    if (!isDragging) return;
+  header.addEventListener("pointermove", e => {
+    if (!dragging) return;
 
-    // Keep window inside viewport while dragging
-    const maxX = window.innerWidth - windowEl.offsetWidth;
-    const maxY = window.innerHeight - windowEl.offsetHeight;
+    x.target = e.clientX - offsetX;
+    y.target = e.clientY - offsetY;
+  });
 
-    let newLeft = e.clientX - offsetX;
-    let newTop = e.clientY - offsetY;
+  header.addEventListener("pointerup", e => {
+    dragging = false;
+    win.releasePointerCapture(e.pointerId);
+  });
 
-    newLeft = Math.max(0, Math.min(newLeft, maxX));
-    newTop = Math.max(0, Math.min(newTop, maxY));
+  function loop() {
+    updateSpring(x);
+    updateSpring(y);
 
-    windowEl.style.left = newLeft + "px";
-    windowEl.style.top = newTop + "px";
-  }
+    // Slight rotation for "jelly" feel
+    const dx = x.velocity;
+    const rotate = Math.max(-5, Math.min(5, dx * 0.2));
 
-  function stopDrag() {
-    isDragging = false;
-    document.removeEventListener("pointermove", drag);
-    document.removeEventListener("pointerup", stopDrag);
+    win.style.transform = `translate(${x.value}px, ${y.value}px) rotate(${rotate}deg)`;
+
+    if (dragging || Math.abs(x.velocity) > 0.1 || Math.abs(y.velocity) > 0.1) {
+      requestAnimationFrame(loop);
+    } else {
+      win.style.transform = `translate(${x.value}px, ${y.value}px) rotate(0deg)`;
+    }
   }
 }
 
 // ===============================
-// RESIZE SYSTEM
+// RESIZE WITH JIGGLE
 // ===============================
-function makeResizable(windowEl) {
-  const handles = windowEl.querySelectorAll(".resize-handle");
+function makeResizable(win) {
+  const handles = win.querySelectorAll(".resize-handle");
+
   handles.forEach(handle => {
-    let isResizing = false;
+    let resizing = false;
+
+    let widthSpring = createSpring(win.offsetWidth);
+    let heightSpring = createSpring(win.offsetHeight);
+
     let startX, startY, startW, startH;
 
     handle.addEventListener("pointerdown", e => {
       e.preventDefault();
-      isResizing = true;
-      const rect = windowEl.getBoundingClientRect();
-      startX = e.clientX; startY = e.clientY;
-      startW = rect.width; startH = rect.height;
-      bringToFront(windowEl);
-      document.addEventListener("pointermove", resize);
-      document.addEventListener("pointerup", stopResize);
+      resizing = true;
+
+      const rect = win.getBoundingClientRect();
+
+      startX = e.clientX;
+      startY = e.clientY;
+      startW = rect.width;
+      startH = rect.height;
+
+      widthSpring.target = startW;
+      heightSpring.target = startH;
+
+      win.setPointerCapture(e.pointerId);
+      requestAnimationFrame(loop);
     });
 
-    function resize(e) {
-      if (!isResizing) return;
+    handle.addEventListener("pointermove", e => {
+      if (!resizing) return;
+
       const dx = e.clientX - startX;
       const dy = e.clientY - startY;
 
-      const maxWidth = window.innerWidth - windowEl.offsetLeft;
-      const maxHeight = window.innerHeight - windowEl.offsetTop;
-
       if (handle.classList.contains("resize-r") || handle.classList.contains("resize-br")) {
-        windowEl.style.width = Math.max(200, Math.min(startW + dx, maxWidth)) + "px";
+        widthSpring.target = Math.max(200, startW + dx);
       }
-      if (handle.classList.contains("resize-b") || handle.classList.contains("resize-br")) {
-        windowEl.style.height = Math.max(150, Math.min(startH + dy, maxHeight)) + "px";
-      }
-    }
 
-    function stopResize() {
-      isResizing = false;
-      document.removeEventListener("pointermove", resize);
-      document.removeEventListener("pointerup", stopResize);
+      if (handle.classList.contains("resize-b") || handle.classList.contains("resize-br")) {
+        heightSpring.target = Math.max(150, startH + dy);
+      }
+    });
+
+    handle.addEventListener("pointerup", e => {
+      resizing = false;
+      win.releasePointerCapture(e.pointerId);
+    });
+
+    function loop() {
+      updateSpring(widthSpring, 0.15, 0.7);
+      updateSpring(heightSpring, 0.15, 0.7);
+
+      // Stretch effect (squish)
+      const stretchX = (widthSpring.velocity * 0.05);
+      const stretchY = (heightSpring.velocity * 0.05);
+
+      win.style.width = widthSpring.value + "px";
+      win.style.height = heightSpring.value + "px";
+
+      win.style.transform += ` scale(${1 + stretchX}, ${1 + stretchY})`;
+
+      if (
+        resizing ||
+        Math.abs(widthSpring.velocity) > 0.1 ||
+        Math.abs(heightSpring.velocity) > 0.1
+      ) {
+        requestAnimationFrame(loop);
+      } else {
+        win.style.transform = win.style.transform.replace(/scale\(.*?\)/, "");
+      }
     }
   });
 }
@@ -242,26 +249,6 @@ document.addEventListener("DOMContentLoaded", () => {
     makeResizable(win);
   });
 });
-
-// ===============================
-// CRASH LOGGER
-// ===============================
-function renderCrashLogs() {
-  const list = document.getElementById("crashList");
-  list.innerHTML = "";
-  if (!window.CrashLogger) return;
-  CrashLogger.logs.forEach(log => {
-    const item = document.createElement("div");
-    item.innerHTML = `<b>${log.source}</b> - ${log.time}<br>${log.message}`;
-    list.appendChild(item);
-  });
-}
-
-function clearCrashes() {
-  if (!window.CrashLogger) return;
-  CrashLogger.clear();
-  renderCrashLogs();
-}
 </script>
 <script src="js/crashlogger.js"></script>
 </body>
