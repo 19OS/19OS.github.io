@@ -150,58 +150,72 @@
     }
 
     // ---------- Drag ----------
-    function makeDraggable(win) {
-      const header = win.querySelector(".window-titlebar");
-      if (!header) return;
+function makeDraggable(win) {
+  const header = win.querySelector(".window-titlebar");
+  if (!header) return;
 
-      let isDragging = false, offsetX=0, offsetY=0;
-      let targetX=0, targetY=0, currentX=0, currentY=0;
-      let rafId=null;
+  let isDragging = false;
+  let offsetX = 0, offsetY = 0;
+  let targetX = 0, targetY = 0, currentX = 0, currentY = 0;
+  let rafId = null;
 
-      function getPos(e){ return e.touches? {x:e.touches[0].clientX, y:e.touches[0].clientY} : {x:e.clientX, y:e.clientY}; }
+  function getPos(e) {
+    return e.touches
+      ? { x: e.touches[0].clientX, y: e.touches[0].clientY }
+      : { x: e.clientX, y: e.clientY };
+  }
 
-      function startDrag(e){
-        e.preventDefault();
-        isDragging=true;
-        bringToFront(win);
-        const rect=win.getBoundingClientRect();
-        const pos=getPos(e);
-        offsetX = pos.x - rect.left;
-        offsetY = pos.y - rect.top;
+  function startDrag(e) {
+    e.preventDefault();
+    isDragging = true;
+    bringToFront(win);
 
-        document.addEventListener("mousemove", drag);
-        document.addEventListener("mouseup", stopDrag);
-        document.addEventListener("touchmove", drag, {passive:false});
-        document.addEventListener("touchend", stopDrag);
-      }
+    const rect = win.getBoundingClientRect();
+    const pos = getPos(e);
 
-      function drag(e){
-        if(!isDragging) return;
-        e.preventDefault();
-        const pos=getPos(e);
-        targetX = pos.x - offsetX;
-        targetY = pos.y - offsetY;
-        if(!rafId) rafId = requestAnimationFrame(updatePosition);
-      }
+    offsetX = pos.x - rect.left;
+    offsetY = pos.y - rect.top;
 
-      function updatePosition(){
-        currentX = targetX; currentY = targetY;
-        win.style.transform = `translate3d(${currentX}px,${currentY}px,0)`;
-        rafId = null;
-      }
+    document.addEventListener("mousemove", drag);
+    document.addEventListener("mouseup", stopDrag);
+    document.addEventListener("touchmove", drag, { passive: false });
+    document.addEventListener("touchend", stopDrag);
+  }
 
-      function stopDrag(){
-        isDragging=false;
-        document.removeEventListener("mousemove", drag);
-        document.removeEventListener("mouseup", stopDrag);
-        document.removeEventListener("touchmove", drag);
-        document.removeEventListener("touchend", stopDrag);
-      }
+  function drag(e) {
+    if (!isDragging) return;
+    e.preventDefault();
 
-      header.addEventListener("mousedown", startDrag);
-      header.addEventListener("touchstart", startDrag, {passive:false});
-    }
+    const pos = getPos(e);
+    targetX = pos.x - offsetX;
+    targetY = pos.y - offsetY;
 
+    if (!rafId) rafId = requestAnimationFrame(updatePosition);
+  }
+
+  function updatePosition() {
+    // Boundaries: keep window inside viewport
+    const vw = window.innerWidth, vh = window.innerHeight;
+    const rect = win.getBoundingClientRect();
+
+    currentX = Math.max(0, Math.min(targetX, vw - rect.width));
+    currentY = Math.max(0, Math.min(targetY, vh - rect.height));
+
+    win.style.transform = `translate3d(${currentX}px, ${currentY}px, 0)`;
+    rafId = null;
+  }
+
+  function stopDrag() {
+    isDragging = false;
+    document.removeEventListener("mousemove", drag);
+    document.removeEventListener("mouseup", stopDrag);
+    document.removeEventListener("touchmove", drag);
+    document.removeEventListener("touchend", stopDrag);
+  }
+
+  header.addEventListener("mousedown", startDrag);
+  header.addEventListener("touchstart", startDrag, { passive: false });
+}
     // ---------- Resize ----------
     function makeResizable(win){
       const handles = win.querySelectorAll(".resize-handle");
