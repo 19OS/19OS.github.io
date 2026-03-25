@@ -23,7 +23,8 @@
 
   overflow: hidden;
 
-  transform: scale(0.96);
+  /* FIXED: remove static scale to prevent JS conflict */
+  transform: translate3d(0,0,0);
   opacity: 0.9;
 
   transition:
@@ -34,9 +35,8 @@
 
 /* 🧠 ACTIVE WINDOW */
 .appwindow.active {
-  transform: scale(1);
+  /* Scale effect preserved during drag via JS */
   opacity: 1;
-
   box-shadow:
     0 25px 80px rgba(0,0,0,0.5),
     inset 0 1px 0 rgba(255,255,255,0.2);
@@ -68,8 +68,8 @@
   cursor: grab;
   user-select: none;
 
-  /* ✅ FIXED: allow taps but still draggable */
-  touch-action: pan-y;
+  /* MOBILE FIX: allow full drag in all directions */
+  touch-action: none;
 }
 
 .window-titlebar:active {
@@ -111,14 +111,12 @@
     box-shadow 0.2s ease,
     filter 0.2s ease;
 
-  /* ✅ MOBILE FIXES */
   -webkit-tap-highlight-color: transparent;
-  touch-action: manipulation;
   pointer-events: auto;
   z-index: 5;
 }
 
-/* ✅ BIGGER INVISIBLE TAP AREA */
+/* BIGGER INVISIBLE TAP AREA */
 .window-controls button::before {
   content: "";
   position: absolute;
