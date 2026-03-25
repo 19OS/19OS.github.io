@@ -84,34 +84,30 @@
 
 <script>
 // ===============================
-// SPRING PHYSICS ENGINE
+// JIGGLE PHYSICS CORE
 // ===============================
-function createSpring(initial) {
-  return {
-    value: initial,
-    velocity: 0,
-    target: initial
-  };
+function spring(val) {
+  return { value: val, velocity: 0, target: val };
 }
 
-function updateSpring(spring, stiffness = 0.12, damping = 0.75) {
-  const force = (spring.target - spring.value) * stiffness;
-  spring.velocity += force;
-  spring.velocity *= damping;
-  spring.value += spring.velocity;
+function step(s, k = 0.12, d = 0.75) {
+  const force = (s.target - s.value) * k;
+  s.velocity += force;
+  s.velocity *= d;
+  s.value += s.velocity;
 }
 
 // ===============================
-// DRAG WITH JIGGLE
+// DRAG SYSTEM (JIGGLE + GPU)
 // ===============================
 function makeDraggable(win) {
   const header = win.querySelector(".window-titlebar");
   if (!header) return;
 
-  const rect = win.getBoundingClientRect();
+  let rect = win.getBoundingClientRect();
 
-  let x = createSpring(rect.left);
-  let y = createSpring(rect.top);
+  let x = spring(rect.left);
+  let y = spring(rect.top);
 
   let dragging = false;
   let offsetX = 0, offsetY = 0;
@@ -120,8 +116,9 @@ function makeDraggable(win) {
     if (e.target.closest(".window-controls")) return;
 
     dragging = true;
-    const r = win.getBoundingClientRect();
+    bringToFront(win);
 
+    const r = win.getBoundingClientRect();
     offsetX = e.clientX - r.left;
     offsetY = e.clientY - r.top;
 
@@ -145,25 +142,30 @@ function makeDraggable(win) {
   });
 
   function loop() {
-    updateSpring(x);
-    updateSpring(y);
+    step(x);
+    step(y);
 
-    // Slight rotation for "jelly" feel
-    const dx = x.velocity;
-    const rotate = Math.max(-5, Math.min(5, dx * 0.2));
+    // subtle tilt
+    const tilt = Math.max(-6, Math.min(6, x.velocity * 0.25));
 
-    win.style.transform = `translate(${x.value}px, ${y.value}px) rotate(${rotate}deg)`;
+    win.style.transform =
+      `translate(${x.value}px, ${y.value}px) rotate(${tilt}deg)`;
 
-    if (dragging || Math.abs(x.velocity) > 0.1 || Math.abs(y.velocity) > 0.1) {
+    if (
+      dragging ||
+      Math.abs(x.velocity) > 0.1 ||
+      Math.abs(y.velocity) > 0.1
+    ) {
       requestAnimationFrame(loop);
     } else {
-      win.style.transform = `translate(${x.value}px, ${y.value}px) rotate(0deg)`;
+      win.style.transform =
+        `translate(${x.value}px, ${y.value}px) rotate(0deg)`;
     }
   }
 }
 
 // ===============================
-// RESIZE WITH JIGGLE
+// RESIZE SYSTEM (JELLY)
 // ===============================
 function makeResizable(win) {
   const handles = win.querySelectorAll(".resize-handle");
@@ -171,8 +173,8 @@ function makeResizable(win) {
   handles.forEach(handle => {
     let resizing = false;
 
-    let widthSpring = createSpring(win.offsetWidth);
-    let heightSpring = createSpring(win.offsetHeight);
+    let w = spring(win.offsetWidth);
+    let h = spring(win.offsetHeight);
 
     let startX, startY, startW, startH;
 
@@ -187,8 +189,8 @@ function makeResizable(win) {
       startW = rect.width;
       startH = rect.height;
 
-      widthSpring.target = startW;
-      heightSpring.target = startH;
+      w.target = startW;
+      h.target = startH;
 
       win.setPointerCapture(e.pointerId);
       requestAnimationFrame(loop);
@@ -201,11 +203,11 @@ function makeResizable(win) {
       const dy = e.clientY - startY;
 
       if (handle.classList.contains("resize-r") || handle.classList.contains("resize-br")) {
-        widthSpring.target = Math.max(200, startW + dx);
+        w.target = Math.max(200, startW + dx);
       }
 
       if (handle.classList.contains("resize-b") || handle.classList.contains("resize-br")) {
-        heightSpring.target = Math.max(150, startH + dy);
+        h.target = Math.max(150, startH + dy);
       }
     });
 
@@ -215,22 +217,22 @@ function makeResizable(win) {
     });
 
     function loop() {
-      updateSpring(widthSpring, 0.15, 0.7);
-      updateSpring(heightSpring, 0.15, 0.7);
+      step(w, 0.15, 0.7);
+      step(h, 0.15, 0.7);
 
-      // Stretch effect (squish)
-      const stretchX = (widthSpring.velocity * 0.05);
-      const stretchY = (heightSpring.velocity * 0.05);
+      // stretch effect
+      const stretchX = 1 + (w.velocity * 0.03);
+      const stretchY = 1 + (h.velocity * 0.03);
 
-      win.style.width = widthSpring.value + "px";
-      win.style.height = heightSpring.value + "px";
+      win.style.width = w.value + "px";
+      win.style.height = h.value + "px";
 
-      win.style.transform += ` scale(${1 + stretchX}, ${1 + stretchY})`;
+      win.style.transform += ` scale(${stretchX}, ${stretchY})`;
 
       if (
         resizing ||
-        Math.abs(widthSpring.velocity) > 0.1 ||
-        Math.abs(heightSpring.velocity) > 0.1
+        Math.abs(w.velocity) > 0.1 ||
+        Math.abs(h.velocity) > 0.1
       ) {
         requestAnimationFrame(loop);
       } else {
@@ -241,12 +243,16 @@ function makeResizable(win) {
 }
 
 // ===============================
-// INIT
+// INIT (KEEP THIS)
 // ===============================
 document.addEventListener("DOMContentLoaded", () => {
   document.querySelectorAll(".appwindow").forEach(win => {
     makeDraggable(win);
     makeResizable(win);
+
+    // GPU boost
+    win.style.willChange = "transform, width, height";
+    win.style.transform = "translateZ(0)";
   });
 });
 </script>
