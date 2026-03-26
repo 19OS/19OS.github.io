@@ -181,10 +181,14 @@ video {
 
     <!-- WINDOWS -->
   <div id="cameraApp" class="appwindow hidden">
-  <div class="titlebar">
-    <span>Camera</span>
-    <button onclick="closeWindow('cameraApp')">✖</button>
-  </div>
+  <div class="resize-handle resize-br"></div>
+      <div class="resize-handle resize-r"></div>
+      <div class="resize-handle resize-b"></div>
+      <div class="window-titlebar">
+        <span>Camera</span>
+        <div class="window-controls">
+          <button onclick="closeWindow('cameraApp'); event.stopPropagation();">×</button>
+        </div>
   <div class="camera-content">
     <video id="cameraVideo" autoplay playsinline></video>
     <canvas id="cameraCanvas" class="hidden"></canvas>
