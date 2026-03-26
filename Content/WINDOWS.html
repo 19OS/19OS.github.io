@@ -184,13 +184,31 @@
       <div id="crashList"></div>
       <button onclick="clearCrashes()">Clear Logs</button>
     </div>
+  <div id="browser" class="appwindow hidden">
+  <div class="resize-handle resize-br"></div>
+  <div class="resize-handle resize-r"></div>
+  <div class="resize-handle resize-b"></div>
 
+  <div class="window-titlebar">
+    <span>Browser</span>
+    <div class="window-controls">
+      <button onclick="closeWindow('browser'); event.stopPropagation();">×</button>
+    </div>
+  </div>
+
+  <iframe src="Apps/com.browser.app/Index.html"
+          class="window-content"
+          sandbox="allow-scripts allow-same-origin allow-popups">
+  </iframe>
+</div>
+  
     <!-- DOCK -->
     <div class="dock glass">
       <button class="dock-icon" onclick="openWindow('myApp')">Calc</button>
       <button class="dock-icon" onclick="openWindow('secret')">Secret</button>
       <button class="dock-icon" onclick="openWindow('poki')">Poki</button>
       <button class="dock-icon" onclick="openWindow('crashViewer')">Crashes</button>
+      <button class="dock-icon" onclick="openWindow('browser')">🌐</button>
     </div>
   </div>
 
@@ -424,3 +442,4 @@ function makeDraggable(win) {
   </script>
 </body>
 </html>
+<!-- Made with love <3 -->
