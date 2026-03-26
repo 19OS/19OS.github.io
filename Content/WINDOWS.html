@@ -95,6 +95,52 @@
 .hidden {
   display: none;
 }
+  #cameraApp {
+  width: 400px;
+  height: 350px;
+  border-radius: 18px;
+  background: rgba(255,255,255,0.08);
+  backdrop-filter: blur(20px) saturate(1.5);
+  -webkit-backdrop-filter: blur(20px) saturate(1.5);
+  display: flex;
+  flex-direction: column;
+  position: absolute;
+  top: 50px;
+  left: 50px;
+  overflow: hidden;
+}
+
+.titlebar {
+  height: 35px;
+  background: rgba(255,255,255,0.1);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 10px;
+  cursor: move;
+}
+
+.camera-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 10px;
+}
+
+video {
+  width: 100%;
+  border-radius: 12px;
+  background: black;
+}
+
+.camera-controls {
+  margin-top: 10px;
+  display: flex;
+  gap: 10px;
+}
+  
 </style>
 </head>
 
@@ -134,6 +180,22 @@
     <h2 class="title">19OS</h2>
 
     <!-- WINDOWS -->
+  <div id="cameraApp" class="appwindow hidden">
+  <div class="titlebar">
+    <span>Camera</span>
+    <button onclick="closeWindow('cameraApp')">✖</button>
+  </div>
+  <div class="camera-content">
+    <video id="cameraVideo" autoplay playsinline></video>
+    <canvas id="cameraCanvas" class="hidden"></canvas>
+    <div class="camera-controls">
+      <button id="snapBtn">📸 Take Photo</button>
+      <button id="switchBtn">🔄 Switch Camera</button>
+      <button id="downloadBtn" class="hidden">💾 Download</button>
+    </div>
+  </div>
+</div>
+  
     <div id="myApp" class="appwindow hidden">
       <div class="resize-handle resize-br"></div>
       <div class="resize-handle resize-r"></div>
@@ -209,6 +271,7 @@
       <button class="dock-icon" onclick="openWindow('poki')">Poki</button>
       <button class="dock-icon" onclick="openWindow('crashViewer')">Crashes</button>
       <button class="dock-icon" onclick="openWindow('browser')">🌐</button>
+      <button class="dock-icon" onclick="openWindow('cameraApp')">Camera</button>
     </div>
   </div>
 
@@ -220,6 +283,61 @@
     // ===============================
 // 🍎 CONTROL CENTER LOGIC
 // ===============================
+    let video = document.getElementById("cameraVideo");
+let canvas = document.getElementById("cameraCanvas");
+let snapBtn = document.getElementById("snapBtn");
+let switchBtn = document.getElementById("switchBtn");
+let downloadBtn = document.getElementById("downloadBtn");
+
+let currentStream = null;
+let useFrontCamera = true;
+
+// Open camera
+async function startCamera() {
+  if (currentStream) {
+    currentStream.getTracks().forEach(track => track.stop());
+  }
+
+  const constraints = {
+    video: { facingMode: useFrontCamera ? "user" : "environment" }
+  };
+
+  try {
+    currentStream = await navigator.mediaDevices.getUserMedia(constraints);
+    video.srcObject = currentStream;
+  } catch (err) {
+    alert("Cannot access camera: " + err);
+  }
+}
+
+// Take snapshot
+snapBtn.addEventListener("click", () => {
+  canvas.width = video.videoWidth;
+  canvas.height = video.videoHeight;
+  canvas.getContext("2d").drawImage(video, 0, 0);
+  canvas.classList.remove("hidden");
+  downloadBtn.classList.remove("hidden");
+});
+
+// Switch camera
+switchBtn.addEventListener("click", () => {
+  useFrontCamera = !useFrontCamera;
+  startCamera();
+});
+
+// Download photo
+downloadBtn.addEventListener("click", () => {
+  const link = document.createElement("a");
+  link.download = "photo.png";
+  link.href = canvas.toDataURL("image/png");
+  link.click();
+});
+
+// Start camera when window opens
+function openCameraApp() {
+  document.getElementById("cameraApp").classList.remove("hidden");
+  startCamera();
+}
 function toggleControlCenter() {
   const cc = document.getElementById("controlCenter");
 
