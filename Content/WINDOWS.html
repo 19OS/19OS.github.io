@@ -273,27 +273,48 @@ function closeWindow(id){
 }
 
 // DRAG
-document.querySelectorAll(".appwindow").forEach(win=>{
-  let bar=win.querySelector(".window-titlebar");
+document.querySelectorAll(".appwindow").forEach(win => {
+  let bar = win.querySelector(".window-titlebar");
 
-  bar.onmousedown=e=>{
+  const startDrag = (e) => {
+    // Determine if it's a touch or mouse event
+    const isTouch = e.type === 'touchstart';
+    const clientX = isTouch ? e.touches[0].clientX : e.clientX;
+    const clientY = isTouch ? e.touches[0].clientY : e.clientY;
+
+    // Prevent scrolling/selection
+    if (e.cancelable) e.preventDefault(); 
+    
     bringToFront(win);
 
-    let shiftX=e.clientX - win.getBoundingClientRect().left;
-    let shiftY=e.clientY - win.getBoundingClientRect().top;
+    const rect = win.getBoundingClientRect();
+    const shiftX = clientX - rect.left;
+    const shiftY = clientY - rect.top;
 
-    function move(e){
-      win.style.left=e.clientX-shiftX+"px";
-      win.style.top=e.clientY-shiftY+"px";
+    function move(e) {
+      const moveX = isTouch ? e.touches[0].clientX : e.clientX;
+      const moveY = isTouch ? e.touches[0].clientY : e.clientY;
+      
+      win.style.left = moveX - shiftX + "px";
+      win.style.top = moveY - shiftY + "px";
     }
 
-    document.addEventListener("mousemove",move);
-    document.onmouseup=()=>{
-      document.removeEventListener("mousemove",move);
-    };
-  };
-});
+    // Add listeners to document to handle fast movement
+    const moveEvent = isTouch ? "touchmove" : "mousemove";
+    const endEvent = isTouch ? "touchend" : "mouseup";
 
+    document.addEventListener(moveEvent, move, { passive: false });
+
+    document.addEventListener(endEvent, () => {
+      document.removeEventListener(moveEvent, move);
+    }, { once: true });
+  };
+
+  bar.onmousedown = startDrag;
+  bar.ontouchstart = startDrag;
+
+  bar.ondragstart = () => false;
+});
 // CONTROL CENTER FIX
 function toggleControlCenter(){
   let cc=document.getElementById("controlCenter");
