@@ -1,12 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>19OS</title>
-  <link rel="stylesheet" href="CSS/main.css">
-  <style>
-  /* ===============================
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>19OS</title>
+
+<link rel="stylesheet" href="CSS/main.css">
+
+<style>
+/* ===============================
    🍎 CONTROL CENTER
 =============================== */
 .cc {
@@ -19,7 +21,6 @@
   justify-content: flex-end;
   align-items: flex-start;
   pointer-events: none;
-  transition: all 0.3s ease;
 }
 
 .cc-panel {
@@ -31,28 +32,13 @@
   backdrop-filter: blur(25px);
   transform: translateY(-20px) scale(0.95);
   opacity: 0;
-  transition: all 0.3s ease;
+  transition: 0.3s ease;
   pointer-events: auto;
 }
 
 .cc.show .cc-panel {
   transform: translateY(0) scale(1);
   opacity: 1;
-}
-
-.cc-header {
-  font-weight: bold;
-  margin-bottom: 10px;
-}
-
-.cc-group {
-  margin-bottom: 12px;
-}
-
-.cc-buttons {
-  display: flex;
-  gap: 8px;
-  margin-top: 6px;
 }
 
 .cc-buttons button {
@@ -65,70 +51,75 @@
   cursor: pointer;
 }
 
-/* Toggle button */
 #ccToggle {
   position: fixed;
   top: 10px;
   right: 10px;
   z-index: 9999;
-  background: rgba(0,0,0,0.6);
-  color: white;
-  border: none;
-  border-radius: 10px;
-  padding: 8px;
-  backdrop-filter: blur(10px);
 }
 
-/* Hidden */
 .hidden { display: none; }
 
-/* ---------------- Camera App ---------------- */
-#cameraApp {
-  width: 400px;
-  height: 350px;
-  border-radius: 18px;
-  background: rgba(255,255,255,0.08);
-  backdrop-filter: blur(20px) saturate(1.5);
+/* ================= WINDOW ================= */
+.appwindow {
+  position: absolute;
+  width: 420px;
+  height: 320px;
   display: flex;
   flex-direction: column;
-  position: absolute;
-  top: 50px;
-  left: 50px;
-  overflow: hidden;
+  border-radius: 18px;
+  background: rgba(255,255,255,0.08);
+  backdrop-filter: blur(25px);
+  box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+  transition: 0.2s ease;
 }
 
-.titlebar {
+.window-titlebar {
   height: 35px;
-  background: rgba(255,255,255,0.1);
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 0 10px;
   cursor: move;
+  background: rgba(255,255,255,0.1);
 }
 
-.camera-content {
+.window-content {
   flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 10px;
-}
-
-video {
   width: 100%;
-  border-radius: 12px;
-  background: black;
+  border: none;
 }
 
-.camera-controls {
-  margin-top: 10px;
-  display: flex;
-  gap: 10px;
+/* ================= RESIZE ================= */
+.resize-handle {
+  position: absolute;
 }
 
-/* ---------------- Dock ---------------- */
+.resize-br {
+  width: 15px;
+  height: 15px;
+  right: 0;
+  bottom: 0;
+  cursor: nwse-resize;
+}
+
+.resize-r {
+  width: 8px;
+  height: 100%;
+  right: 0;
+  top: 0;
+  cursor: ew-resize;
+}
+
+.resize-b {
+  height: 8px;
+  width: 100%;
+  bottom: 0;
+  left: 0;
+  cursor: ns-resize;
+}
+
+/* ================= DOCK ================= */
 .dock {
   position: fixed;
   bottom: 10px;
@@ -143,214 +134,170 @@ video {
 }
 
 .dock-icon {
-  background: rgba(255,255,255,0.1);
-  border: none;
-  padding: 10px 14px;
+  padding: 10px;
   border-radius: 12px;
-  color: white;
   cursor: pointer;
 }
 
-/* ---------------- Notifications ---------------- */
+/* ================= NOTIFICATIONS ================= */
 #notifications {
   position: fixed;
   top: 80px;
   right: 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  z-index: 99999;
 }
 
 .notification {
   background: rgba(0,0,0,0.7);
-  color: white;
-  padding: 10px 14px;
-  border-radius: 12px;
-  font-size: 14px;
-  animation: slideIn 0.3s ease;
+  padding: 10px;
+  border-radius: 10px;
+  margin-bottom: 5px;
 }
-
-@keyframes slideIn {
-  from { transform: translateX(100%); opacity: 0; }
-  to { transform: translateX(0); opacity: 1; }
-}
-  </style>
+</style>
 </head>
+
 <body>
 
-  <!-- 🍎 CONTROL CENTER -->
+<!-- CONTROL CENTER -->
 <div id="controlCenter" class="cc hidden">
   <div class="cc-panel glass">
-    <div class="cc-header">Control Center</div>
-    <div class="cc-group">
-      <span>Focus</span>
-      <div class="cc-buttons">
-        <button onclick="setFocusMode('gaming')">🎮</button>
-        <button onclick="setFocusMode('coding')">💻</button>
-        <button onclick="setFocusMode('chill')">🌙</button>
-        <button onclick="setFocusMode('default')">🔓</button>
-      </div>
+    <div>Control Center</div>
+
+    <div>
+      <button onclick="setFocusMode('gaming')">🎮</button>
+      <button onclick="setFocusMode('coding')">💻</button>
+      <button onclick="setFocusMode('chill')">🌙</button>
     </div>
-    <div class="cc-group">
-      <span>System</span>
-      <div class="cc-buttons">
-        <button onclick="toggleWifi()">📶</button>
-        <button onclick="toggleSound()">🔊</button>
-        <button onclick="toggleTheme()">🎨</button>
-      </div>
+
+    <div>
+      <button onclick="toggleWifi()">📶</button>
+      <button onclick="toggleSound()">🔊</button>
+      <button onclick="toggleTheme()">🎨</button>
     </div>
   </div>
 </div>
 
 <button id="ccToggle" onclick="toggleControlCenter()">⚙️</button>
-<h2 class="title">19OS</h2>
+
+<h2>19OS</h2>
 
 <!-- WINDOWS -->
+
 <div id="cameraApp" class="appwindow hidden">
   <div class="resize-handle resize-br"></div>
   <div class="resize-handle resize-r"></div>
   <div class="resize-handle resize-b"></div>
+
   <div class="window-titlebar">
     <span>Camera</span>
-    <div class="window-controls">
-      <button onclick="closeWindow('cameraApp'); event.stopPropagation();">×</button>
-    </div>
+    <button onclick="closeWindow('cameraApp')">×</button>
   </div>
-  <div class="camera-content">
-    <video id="cameraVideo" autoplay playsinline></video>
-    <canvas id="cameraCanvas" class="hidden"></canvas>
-    <div class="camera-controls">
-      <button id="snapBtn">📸 Take Photo</button>
-      <button id="switchBtn">🔄 Switch Camera</button>
-      <button id="downloadBtn" class="hidden">💾 Download</button>
-    </div>
-  </div>
+
+  <video id="cameraVideo" autoplay playsinline></video>
+  <canvas id="cameraCanvas" class="hidden"></canvas>
+
+  <button id="snapBtn">📸</button>
+  <button id="switchBtn">🔄</button>
+  <button id="downloadBtn" class="hidden">💾</button>
 </div>
 
+<!-- KEEPING YOUR APPS -->
 <div id="myApp" class="appwindow hidden">
-      <div class="resize-handle resize-br"></div>
-      <div class="resize-handle resize-r"></div>
-      <div class="resize-handle resize-b"></div>
-      <div class="window-titlebar">
-        <span>Calculator</span>
-        <div class="window-controls">
-          <button onclick="closeWindow('myApp'); event.stopPropagation();">×</button>
-        </div>
-      </div>
-      <iframe src="Apps/com.calc.app/Index.html" class="window-content" sandbox="allow-scripts allow-same-origin"></iframe>
-    </div>
+  <div class="window-titlebar">
+    <span>Calculator</span>
+    <button onclick="closeWindow('myApp')">×</button>
+  </div>
+  <iframe src="Apps/com.calc.app/Index.html" class="window-content"></iframe>
+</div>
 
-    <div id="secret" class="appwindow hidden">
-      <div class="resize-handle resize-br"></div>
-      <div class="resize-handle resize-r"></div>
-      <div class="resize-handle resize-b"></div>
-      <div class="window-titlebar">
-        <span>Secret Lang</span>
-        <div class="window-controls">
-          <button onclick="closeWindow('secret'); event.stopPropagation();">×</button>
-        </div>
-      </div>
-      <iframe src="Apps/com.os.secretlang/Index.html" class="window-content" sandbox="allow-scripts allow-same-origin"></iframe>
-    </div>
-
-    <div id="poki" class="appwindow hidden">
-      <div class="resize-handle resize-br"></div>
-      <div class="resize-handle resize-r"></div>
-      <div class="resize-handle resize-b"></div>
-      <div class="window-titlebar">
-        <span>Poki</span>
-        <div class="window-controls">
-          <button onclick="closeWindow('poki'); event.stopPropagation();">×</button>
-        </div>
-      </div>
-      <iframe src="https://poki.com/" class="window-content" sandbox="allow-scripts allow-same-origin"></iframe>
-    </div>
-
-    <div id="crashViewer" class="appwindow hidden">
-      <div class="resize-handle resize-br"></div>
-      <div class="resize-handle resize-r"></div>
-      <div class="resize-handle resize-b"></div>
-      <div class="window-titlebar">
-        <span>Crash Viewer</span>
-        <button onclick="closeWindow('crashViewer'); event.stopPropagation();">×</button>
-      </div>
-      <div id="crashList"></div>
-      <button onclick="clearCrashes()">Clear Logs</button>
-    </div>
-  <div id="browser" class="appwindow hidden">
-  <div class="resize-handle resize-br"></div>
-  <div class="resize-handle resize-r"></div>
-  <div class="resize-handle resize-b"></div>
-
+<div id="browser" class="appwindow hidden">
   <div class="window-titlebar">
     <span>Browser</span>
-    <div class="window-controls">
-      <button onclick="closeWindow('browser'); event.stopPropagation();">×</button>
-    </div>
+    <button onclick="closeWindow('browser')">×</button>
   </div>
-
-  <iframe src="Apps/com.browser.app/Index.html"
-          class="window-content"
-          sandbox="allow-scripts allow-same-origin allow-popups">
-  </iframe>
+  <iframe src="Apps/com.browser.app/Index.html" class="window-content"></iframe>
 </div>
-  
+
 <!-- DOCK -->
-<div class="dock glass" style="z-index:99999;">
-  <button class="dock-icon" onclick="openWindow('myApp')">Calc</button>
-  <button class="dock-icon" onclick="openWindow('secret')">Secret</button>
-  <button class="dock-icon" onclick="openWindow('poki')">Poki</button>
-  <button class="dock-icon" onclick="openWindow('crashViewer')">Crashes</button>
-  <button class="dock-icon" onclick="openWindow('browser')">🌐</button>
-  <button class="dock-icon" onclick="openWindow('cameraApp')">Camera</button>
+<div class="dock">
+  <button onclick="openWindow('myApp')">Calc</button>
+  <button onclick="openWindow('browser')">🌐</button>
+  <button onclick="openWindow('cameraApp')">📷</button>
+  <button onclick="openPoki()">🎮</button>
 </div>
 
-<!-- Notifications -->
 <div id="notifications"></div>
 
-<!-- ==============================
-       19OS WINDOW SYSTEM
-       ============================== -->
-  <script src="js/Mode.js"></script>
+<script src="js/Mode.js"></script>
+
 <script>
-let video = document.getElementById("cameraVideo");
-let canvas = document.getElementById("cameraCanvas");
-let snapBtn = document.getElementById("snapBtn");
-let switchBtn = document.getElementById("switchBtn");
-let downloadBtn = document.getElementById("downloadBtn");
+// CAMERA FIX
+let currentStream=null;
+let useFront=true;
 
-let currentStream = null;
-let useFrontCamera = true;
+async function startCamera(){
+  if(currentStream){
+    currentStream.getTracks().forEach(t=>t.stop());
+  }
 
-async function startCamera() {
-  if(currentStream) currentStream.getTracks().forEach(track=>track.stop());
-  const constraints = { video: { facingMode: useFrontCamera?"user":"environment" } };
-  try { currentStream = await navigator.mediaDevices.getUserMedia(constraints); video.srcObject=currentStream; }
-  catch(err){ alert("Cannot access camera: "+err); }
+  currentStream = await navigator.mediaDevices.getUserMedia({
+    video:{ facingMode: useFront ? "user":"environment" }
+  });
+
+  cameraVideo.srcObject = currentStream;
 }
 
-snapBtn.addEventListener("click", ()=>{
-  canvas.width=video.videoWidth;
-  canvas.height=video.videoHeight;
-  canvas.getContext("2d").drawImage(video,0,0);
-  canvas.classList.remove("hidden");
-  downloadBtn.classList.remove("hidden");
-});
-switchBtn.addEventListener("click", ()=>{
-  useFrontCamera=!useFrontCamera;
-  startCamera();
-});
-downloadBtn.addEventListener("click", ()=>{
-  const link=document.createElement("a");
-  link.download="photo.png";
-  link.href=canvas.toDataURL("image/png");
-  link.click();
+// WINDOW SYSTEM
+let z=100;
+
+function bringToFront(el){
+  z++;
+  el.style.zIndex=z;
+}
+
+function openWindow(id){
+  let el=document.getElementById(id);
+  el.classList.remove("hidden");
+  bringToFront(el);
+
+  if(id==="cameraApp") startCamera();
+}
+
+function closeWindow(id){
+  let el=document.getElementById(id);
+  el.classList.add("hidden");
+
+  if(id==="cameraApp" && currentStream){
+    currentStream.getTracks().forEach(t=>t.stop());
+    currentStream=null;
+  }
+}
+
+// DRAG
+document.querySelectorAll(".appwindow").forEach(win=>{
+  let bar=win.querySelector(".window-titlebar");
+
+  bar.onmousedown=e=>{
+    bringToFront(win);
+
+    let shiftX=e.clientX - win.getBoundingClientRect().left;
+    let shiftY=e.clientY - win.getBoundingClientRect().top;
+
+    function move(e){
+      win.style.left=e.clientX-shiftX+"px";
+      win.style.top=e.clientY-shiftY+"px";
+    }
+
+    document.addEventListener("mousemove",move);
+    document.onmouseup=()=>{
+      document.removeEventListener("mousemove",move);
+    };
+  };
 });
 
-// ================= CONTROL CENTER =================
+// CONTROL CENTER FIX
 function toggleControlCenter(){
-  const cc=document.getElementById("controlCenter");
+  let cc=document.getElementById("controlCenter");
+
   if(cc.classList.contains("show")){
     cc.classList.remove("show");
     setTimeout(()=>cc.classList.add("hidden"),200);
@@ -359,114 +306,39 @@ function toggleControlCenter(){
     setTimeout(()=>cc.classList.add("show"),10);
   }
 }
-document.addEventListener("click",(e)=>{
-  const cc=document.getElementById("controlCenter");
-  const panel=cc.querySelector(".cc-panel");
-  if(!panel.contains(e.target)&&e.target.id!=="ccToggle"){ cc.classList.remove("show"); setTimeout(()=>cc.classList.add("hidden"),200); }
-});
-document.addEventListener("keydown",(e)=>{ if(e.key==="Escape"){ const cc=document.getElementById("controlCenter"); cc.classList.remove("show"); setTimeout(()=>cc.classList.add("hidden"),200); } });
 
-// ---------------- FAKE SYSTEM TOGGLES ----------------
-let wifi=true, sound=true;
-function toggleWifi(){ wifi=!wifi; notify("WiFi "+(wifi?"On 📶":"Off ❌")); }
-function toggleSound(){ sound=!sound; notify("Sound "+(sound?"On 🔊":"Muted 🔇")); }
-function toggleTheme(){ const next=document.body.getAttribute("data-theme")==="dark"?"light":"dark"; document.body.setAttribute("data-theme",next); notify("Theme: "+next); }
+// SAFE CLICK CLOSE
+document.addEventListener("click",e=>{
+  let cc=document.getElementById("controlCenter");
+  if(!cc) return;
 
-// ---------------- FOCUS MODES ----------------
-const FocusModes={notify};
-function setFocusMode(mode){
-  let icon="", text="";
-  switch(mode){
-    case "gaming": icon="🎮"; text="Gaming Mode"; break;
-    case "coding": icon="💻"; text="Coding Mode"; break;
-    case "chill": icon="🌙"; text="Chill Mode"; break;
-    default: icon="🔓"; text="Default Mode";
+  let panel=cc.querySelector(".cc-panel");
+  if(!panel) return;
+
+  if(!panel.contains(e.target) && e.target.id!=="ccToggle"){
+    cc.classList.remove("show");
+    setTimeout(()=>cc.classList.add("hidden"),200);
   }
-  notify(icon+" "+text);
-}
-
-// ---------------- NOTIFICATIONS ----------------
-function notify(msg){
-  const container=document.getElementById("notifications");
-  const note=document.createElement("div");
-  note.className="notification"; note.innerText=msg;
-  container.appendChild(note);
-  setTimeout(()=>note.remove(),3000);
-}
-
-// ---------------- WINDOW SYSTEM ----------------
-let zIndexCounter=100;
-function bringToFront(win){ zIndexCounter++; win.style.zIndex=zIndexCounter; }
-
-function openWindow(id){
-  const el=document.getElementById(id);
-  if(!el)return console.warn("Window not found:",id);
-  el.classList.remove("hidden");
-  el.style.display="flex";
-  el.style.transform="translate3d(0,0,0)";
-  bringToFront(el);
-  if(id==="cameraApp") startCamera();
-  if(id==="crashViewer") renderCrashLogs();
-}
-function closeWindow(id){
-  const el=document.getElementById(id);
-  if(!el)return console.warn("Window not found:",id);
-  el.classList.add("hidden");
-  el.style.display="none";
-}
-
-// ---------------- DRAG ----------------
-function makeDraggable(win){
-  const header=win.querySelector(".window-titlebar");
-  if(!header)return;
-  win.style.position="absolute";
-  if(!win.style.transform) win.style.transform="translate3d(0,0,0)";
-  let isDragging=false, offsetX=0, offsetY=0, targetX=0, targetY=0, currentX=0, currentY=0, rafId=null;
-
-  function getPos(e){ return e.touches?{x:e.touches[0].clientX,y:e.touches[0].clientY}:{x:e.clientX,y:e.clientY}; }
-  function startDrag(e){ e.preventDefault(); isDragging=true; bringToFront(win); const rect=win.getBoundingClientRect(); const pos=getPos(e); offsetX=pos.x-rect.left; offsetY=pos.y-rect.top;
-    document.addEventListener("mousemove",drag); document.addEventListener("mouseup",stopDrag);
-    document.addEventListener("touchmove",drag,{passive:false}); document.addEventListener("touchend",stopDrag); }
-  function drag(e){ if(!isDragging) return; e.preventDefault(); const pos=getPos(e); targetX=pos.x-offsetX; targetY=pos.y-offsetY;
-    if(!rafId) rafId=requestAnimationFrame(updatePosition);}
-  function updatePosition(){ const vw=window.innerWidth, vh=window.innerHeight, rect=win.getBoundingClientRect();
-    currentX=Math.max(0,Math.min(targetX,vw-rect.width)); currentY=Math.max(0,Math.min(targetY,vh-rect.height)); win.style.transform=`translate3d(${currentX}px,${currentY}px,0)`; rafId=null; }
-  function stopDrag(){ isDragging=false; document.removeEventListener("mousemove",drag); document.removeEventListener("mouseup",stopDrag);
-    document.removeEventListener("touchmove",drag); document.removeEventListener("touchend",stopDrag);}
-  header.addEventListener("mousedown",startDrag);
-  header.addEventListener("touchstart",startDrag,{passive:false});
-}
-
-// ---------------- RESIZE ----------------
-function makeResizable(win){
-  const minW=150, minH=100;
-  const handles=win.querySelectorAll(".resize-handle");
-  handles.forEach(handle=>{
-    let isResizing=false, startX,startY,startW,startH,targetW,targetH,rafId=null;
-    function getPos(e){ return e.touches?{x:e.touches[0].clientX,y:e.touches[0].clientY}:{x:e.clientX,y:e.clientY}; }
-    function startResize(e){ e.preventDefault(); isResizing=true; bringToFront(win); const rect=win.getBoundingClientRect(); const pos=getPos(e); startX=pos.x; startY=pos.y; startW=rect.width; startH=rect.height;
-      document.addEventListener("mousemove",resize); document.addEventListener("mouseup",stopResize);
-      document.addEventListener("touchmove",resize,{passive:false}); document.addEventListener("touchend",stopResize);}
-    function resize(e){ if(!isResizing)return; e.preventDefault(); const pos=getPos(e); const dx=pos.x-startX, dy=pos.y-startY;
-      if(handle.classList.contains("resize-r")||handle.classList.contains("resize-br")) targetW=startW+dx;
-      if(handle.classList.contains("resize-b")||handle.classList.contains("resize-br")) targetH=startH+dy;
-      if(!rafId) rafId=requestAnimationFrame(applyResize);}
-    function applyResize(){ if(targetW!==undefined) win.style.width=Math.max(minW,targetW)+"px"; if(targetH!==undefined) win.style.height=Math.max(minH,targetH)+"px"; rafId=null;}
-    function stopResize(){ isResizing=false; document.removeEventListener("mousemove",resize); document.removeEventListener("mouseup",stopResize);
-      document.removeEventListener("touchmove",resize); document.removeEventListener("touchend",stopResize);}
-    handle.addEventListener("mousedown",startResize); handle.addEventListener("touchstart",startResize,{passive:false});
-  });
-}
-
-// ---------------- CRASH LOGGER ----------------
-const CrashLogger={logs:[],add(log){this.logs.push({...log,time:new Date().toLocaleTimeString()});},clear(){this.logs=[];}};
-function renderCrashLogs(){ const list=document.getElementById("crashList"); list.innerHTML=""; CrashLogger.logs.forEach(log=>{ const item=document.createElement("div"); item.className="crash-item"; item.innerHTML=`<b>${log.source}</b> - ${log.time}<br>${log.message}<details><summary>Stack</summary><pre>${log.stack}</pre></details>`; list.appendChild(item); }); list.scrollTop=list.scrollHeight;}
-function clearCrashes(){CrashLogger.clear();renderCrashLogs();}
-
-// Initialize draggable/resizable windows
-document.addEventListener("DOMContentLoaded",()=>{
-  document.querySelectorAll(".appwindow").forEach(win=>{ makeDraggable(win); makeResizable(win); });
 });
+
+// SYSTEM
+function notify(msg){
+  let n=document.createElement("div");
+  n.className="notification";
+  n.innerText=msg;
+  notifications.appendChild(n);
+  setTimeout(()=>n.remove(),3000);
+}
+
+function toggleWifi(){ notify("WiFi toggled"); }
+function toggleSound(){ notify("Sound toggled"); }
+function toggleTheme(){ notify("Theme switched"); }
+function setFocusMode(m){ notify("Mode: "+m); }
+
+// POKI FIX
+function openPoki(){
+  window.open("https://poki.com","_blank");
+}
 </script>
 
 </body>
