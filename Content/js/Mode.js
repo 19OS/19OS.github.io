@@ -3,37 +3,17 @@
 // ===============================
 
 const FocusModes = {
+  // Use a getter/setter approach for cleaner state management
   current: localStorage.getItem("focusMode") || "default",
+  notificationsEnabled: true,
 
   modes: {
-    default: {
-      name: "Default",
-      theme: "light",
-      notifications: true
-    },
-
-    gaming: {
-      name: "Gaming",
-      theme: "dark",
-      notifications: false
-    },
-
-    coding: {
-      name: "Coding",
-      theme: "matrix",
-      notifications: false
-    },
-
-    chill: {
-      name: "Chill",
-      theme: "blur",
-      notifications: true
-    }
+    default: { name: "Default", theme: "light", notifications: true },
+    gaming:  { name: "Gaming",  theme: "dark",  notifications: false },
+    coding:  { name: "Coding",  theme: "matrix", notifications: false },
+    chill:   { name: "Chill",   theme: "blur",   notifications: true }
   },
 
-  // ===============================
-  // 🚀 APPLY MODE
-  // ===============================
   apply(modeName) {
     const mode = this.modes[modeName];
     if (!mode) return;
@@ -41,30 +21,23 @@ const FocusModes = {
     this.current = modeName;
     localStorage.setItem("focusMode", modeName);
 
-    console.log("Focus Mode:", mode.name);
-
+    // Update internal state BEFORE notifying
+    this.notificationsEnabled = mode.notifications;
+    
     this.applyTheme(mode.theme);
-    this.handleNotifications(mode);
     this.dispatchEvent(mode);
+
+    // Optional: Notify user of the change
+    console.log(`System: Switched to ${mode.name} mode.`);
+    this.notify(`Mode: ${mode.name}`);
   },
 
-  // ===============================
-  // 🎨 THEME SYSTEM
-  // ===============================
   applyTheme(theme) {
     document.body.setAttribute("data-theme", theme);
   },
 
-  // ===============================
-  // 🔕 NOTIFICATIONS
-  // ===============================
-  notificationsEnabled: true,
-
-  handleNotifications(mode) {
-    this.notificationsEnabled = mode.notifications;
-  },
-
   notify(msg) {
+    // Check global state
     if (!this.notificationsEnabled) return;
 
     const n = document.createElement("div");
@@ -72,12 +45,14 @@ const FocusModes = {
     n.innerText = msg;
 
     document.body.appendChild(n);
-    setTimeout(() => n.remove(), 3000);
+    
+    // Use a class for the fade-out animation instead of just removing
+    setTimeout(() => {
+      n.style.opacity = "0";
+      setTimeout(() => n.remove(), 500);
+    }, 2500);
   },
 
-  // ===============================
-  // 📡 EVENT SYSTEM (IMPORTANT)
-  // ===============================
   dispatchEvent(mode) {
     window.dispatchEvent(new CustomEvent("focusChange", {
       detail: mode
@@ -85,117 +60,9 @@ const FocusModes = {
   }
 };
 
-// ===============================
-// 🎛️ GLOBAL CONTROL
-// ===============================
-function setFocusMode(mode) {
-  FocusModes.apply(mode);
-}
-
-function getFocusMode() {
-  return FocusModes.current;
-}
-
-// Auto apply on load
-window.addEventListener("DOMContentLoaded", () => {
-  FocusModes.apply(FocusModes.current);
-});// ===============================
-// 🧠 19OS Focus Mode System (CORE)
-// ===============================
-
-const FocusModes = {
-  current: localStorage.getItem("focusMode") || "default",
-
-  modes: {
-    default: {
-      name: "Default",
-      theme: "light",
-      notifications: true
-    },
-
-    gaming: {
-      name: "Gaming",
-      theme: "dark",
-      notifications: false
-    },
-
-    coding: {
-      name: "Coding",
-      theme: "matrix",
-      notifications: false
-    },
-
-    chill: {
-      name: "Chill",
-      theme: "blur",
-      notifications: true
-    }
-  },
-
-  // ===============================
-  // 🚀 APPLY MODE
-  // ===============================
-  apply(modeName) {
-    const mode = this.modes[modeName];
-    if (!mode) return;
-
-    this.current = modeName;
-    localStorage.setItem("focusMode", modeName);
-
-    console.log("Focus Mode:", mode.name);
-
-    this.applyTheme(mode.theme);
-    this.handleNotifications(mode);
-    this.dispatchEvent(mode);
-  },
-
-  // ===============================
-  // 🎨 THEME SYSTEM
-  // ===============================
-  applyTheme(theme) {
-    document.body.setAttribute("data-theme", theme);
-  },
-
-  // ===============================
-  // 🔕 NOTIFICATIONS
-  // ===============================
-  notificationsEnabled: true,
-
-  handleNotifications(mode) {
-    this.notificationsEnabled = mode.notifications;
-  },
-
-  notify(msg) {
-    if (!this.notificationsEnabled) return;
-
-    const n = document.createElement("div");
-    n.className = "notification";
-    n.innerText = msg;
-
-    document.body.appendChild(n);
-    setTimeout(() => n.remove(), 3000);
-  },
-
-  // ===============================
-  // 📡 EVENT SYSTEM (IMPORTANT)
-  // ===============================
-  dispatchEvent(mode) {
-    window.dispatchEvent(new CustomEvent("focusChange", {
-      detail: mode
-    }));
-  }
-};
-
-// ===============================
-// 🎛️ GLOBAL CONTROL
-// ===============================
-function setFocusMode(mode) {
-  FocusModes.apply(mode);
-}
-
-function getFocusMode() {
-  return FocusModes.current;
-}
+// Global Helpers
+const setFocusMode = (mode) => FocusModes.apply(mode);
+const getFocusMode = () => FocusModes.current;
 
 // Auto apply on load
 window.addEventListener("DOMContentLoaded", () => {
