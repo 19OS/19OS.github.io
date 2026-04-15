@@ -325,81 +325,108 @@ function closeWindow(id){
 
 // DRAG
 document.querySelectorAll(".appwindow").forEach(win => {
-  let bar = win.querySelector(".window-titlebar");
+  const handles = win.querySelectorAll(".resize-handle");
 
-  const startDrag = (e) => {
-    // Determine if it's a touch or mouse event
-    const isTouch = e.type === 'touchstart';
-    const clientX = isTouch ? e.touches[0].clientX : e.clientX;
-    const clientY = isTouch ? e.touches[0].clientY : e.clientY;
+  handles.forEach(handle => {
+    handle.onmousedown = function(e) {
+      e.preventDefault();
+      bringToFront(win);
 
-    // Prevent scrolling/selection
-    if (e.cancelable) e.preventDefault(); 
-    
-    bringToFront(win);
+      const startWidth = win.offsetWidth;
+      const startHeight = win.offsetHeight;
+      const startX = e.clientX;
+      const startY = e.clientY;
 
-    const rect = win.getBoundingClientRect();
-    const shiftX = clientX - rect.left;
-    const shiftY = clientY - rect.top;
+      function doResize(e) {
+        if (handle.classList.contains('resize-r') || handle.classList.contains('resize-br')) {
+          win.style.width = startWidth + (e.clientX - startX) + 'px';
+        }
+        if (handle.classList.contains('resize-b') || handle.classList.contains('resize-br')) {
+          win.style.height = startHeight + (e.clientY - startY) + 'px';
+        }
+      }
 
-    function move(e) {
-      const moveX = isTouch ? e.touches[0].clientX : e.clientX;
-      const moveY = isTouch ? e.touches[0].clientY : e.clientY;
-      
-      win.style.left = moveX - shiftX + "px";
-      win.style.top = moveY - shiftY + "px";
-    }
+      function stopResize() {
+        document.removeEventListener('mousemove', doResize);
+        document.removeEventListener('mouseup', stopResize);
+      }
 
-    // Add listeners to document to handle fast movement
-    const moveEvent = isTouch ? "touchmove" : "mousemove";
-    const endEvent = isTouch ? "touchend" : "mouseup";
-
-    document.addEventListener(moveEvent, move, { passive: false });
-
-    document.addEventListener(endEvent, () => {
-      document.removeEventListener(moveEvent, move);
-    }, { once: true });
-  };
-
-  bar.onmousedown = startDrag;
-  bar.ontouchstart = startDrag;
-
-  bar.ondragstart = () => false;
+      document.addEventListener('mousemove', doResize);
+      document.addEventListener('mouseup', stopResize);
+    };
+  });
 });
 // CONTROL CENTER FIX
-function toggleControlCenter(){
-  let cc=document.getElementById("controlCenter");
+function toggleControlCenter() {
+  const cc = document.getElementById("controlCenter");
 
-  if(cc.classList.contains("show")){
+  if (cc.classList.contains("show")) {
     cc.classList.remove("show");
-    setTimeout(()=>cc.classList.add("hidden"),200);
-  }else{
+    
+    // Wait for the transition to actually finish
+    cc.addEventListener('transitionend', () => {
+      cc.classList.add("hidden");
+    }, { once: true }); // { once: true } auto-removes the listener
+    
+  } else {
     cc.classList.remove("hidden");
-    setTimeout(()=>cc.classList.add("show"),10);
+    // RequestAnimationFrame is a cleaner "tick" than setTimeout(10)
+    requestAnimationFrame(() => {
+      cc.classList.add("show");
+    });
   }
 }
 
 // SAFE CLICK CLOSE
-document.addEventListener("click",e=>{
-  let cc=document.getElementById("controlCenter");
-  if(!cc) return;
+document.addEventListener("click", e => {
+  const cc = document.getElementById("controlCenter");
+  const toggleBtn = document.getElementById("ccToggle");
+  
+  // 1. Safety check: if CC doesn't exist or isn't currently shown, do nothing
+  if (!cc || !cc.classList.contains("show")) return;
 
-  let panel=cc.querySelector(".cc-panel");
-  if(!panel) return;
+  // 2. Check if the click happened OUTSIDE the panel AND OUTSIDE the toggle button
+  // .closest() handles cases where you click an icon inside the button
+  const clickedInsidePanel = cc.contains(e.target);
+  const clickedToggle = toggleBtn && toggleBtn.contains(e.target);
 
-  if(!panel.contains(e.target) && e.target.id!=="ccToggle"){
+  if (!clickedInsidePanel && !clickedToggle) {
+    // Start the close animation
     cc.classList.remove("show");
-    setTimeout(()=>cc.classList.add("hidden"),200);
+
+    // Wait for the CSS transition (e.g., 200ms) before applying display: none
+    setTimeout(() => {
+      // Re-verify it hasn't been reopened during the timeout
+      if (!cc.classList.contains("show")) {
+        cc.classList.add("hidden");
+      }
+    }, 200);
   }
 });
 
 // SYSTEM
-function notify(msg){
-  let n=document.createElement("div");
-  n.className="notification";
-  n.innerText=msg;
-  notifications.appendChild(n);
-  setTimeout(()=>n.remove(),3000);
+function notify(msg) {
+  // 1. Ensure the container exists
+  const container = document.getElementById("notifications") || document.body;
+
+  // 2. Create the element
+  const n = document.createElement("div");
+  n.className = "notification";
+  n.innerText = msg;
+
+  // 3. Append to the container
+  container.appendChild(n);
+
+  // 4. Clean up with a fade-out (optional but recommended)
+  setTimeout(() => {
+    n.classList.add("fade-out"); // Add a CSS class for a smooth exit
+    n.addEventListener("transitionend", () => n.remove());
+    
+    // Fallback if no CSS transition is defined
+    if (getComputedStyle(n).transitionDuration === "0s") {
+      n.remove();
+    }
+  }, 3000);
 }
 
 function toggleWifi(){ notify("WiFi toggled"); }
