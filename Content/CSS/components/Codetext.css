@@ -1,0 +1,109 @@
+/* ===============================
+   💻 UNIVERSAL CODE EDITOR
+=============================== */
+
+.coding-text {
+  font-family: "JetBrains Mono", "Fira Code", monospace;
+  font-size: 14px;
+  line-height: 1.6;
+
+  color: #e6e6e6;
+  background: rgba(15, 15, 18, 0.9);
+
+  padding: 16px;
+  border-radius: 16px;
+
+  backdrop-filter: blur(25px);
+  -webkit-backdrop-filter: blur(25px);
+
+  overflow-x: auto;
+  white-space: pre;
+
+  box-shadow: 0 12px 40px rgba(0,0,0,0.5);
+  caret-color: #ffffff;
+}
+
+/* ===============================
+   🌈 TOKEN COLORS (UNIVERSAL)
+=============================== */
+
+.coding-text .kw   { color: #ff7ab2; } /* keywords */
+.coding-text .str  { color: #9fe870; } /* strings */
+.coding-text .num  { color: #79c0ff; } /* numbers */
+.coding-text .fn   { color: #d2a8ff; } /* functions */
+.coding-text .com  { color: #6e7681; font-style: italic; } /* comments */
+.coding-text .var  { color: #ffa657; } /* variables */
+.coding-text .op   { color: #f2cc60; } /* operators */
+.coding-text .bool { color: #ff9e64; } /* true/false */
+.coding-text .nil  { color: #ff5370; } /* null/nil */
+.coding-text .type { color: #4ec9b0; } /* types */
+.coding-text .tag  { color: #7ee787; } /* html tags */
+.coding-text .attr { color: #79c0ff; } /* attributes */
+.coding-text .prop { color: #e06c75; } /* css properties */
+
+/* ===============================
+   🐍 PYTHON
+=============================== */
+
+.coding-text.python .kw { color: #ff7ab2; }
+.coding-text.python .fn { color: #61afef; }
+.coding-text.python .com { color: #5c6370; }
+
+/* ===============================
+   🌙 LUA
+=============================== */
+
+.coding-text.lua .kw { color: #c678dd; }
+.coding-text.lua .fn { color: #61afef; }
+.coding-text.lua .nil { color: #ff5370; }
+.coding-text.lua .bool { color: #e5c07b; }
+
+/* ===============================
+   ⚡ JAVASCRIPT / TYPESCRIPT
+=============================== */
+
+.coding-text.js .kw { color: #ff7ab2; }
+.coding-text.js .fn { color: #dcdcaa; }
+.coding-text.js .var { color: #9cdcfe; }
+
+/* ===============================
+   🌐 HTML
+=============================== */
+
+.coding-text.html .tag { color: #e06c75; }
+.coding-text.html .attr { color: #d19a66; }
+.coding-text.html .str { color: #98c379; }
+
+/* ===============================
+   🎨 CSS
+=============================== */
+
+.coding-text.css .prop { color: #e06c75; }
+.coding-text.css .num { color: #d19a66; }
+
+/* ===============================
+   🧾 JSON
+=============================== */
+
+.coding-text.json .attr { color: #9cdcfe; }
+.coding-text.json .str { color: #ce9178; }
+
+/* ===============================
+   🧊 GLASS MODE
+=============================== */
+
+.coding-text.glass {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.08);
+}
+
+/* ===============================
+   📱 MOBILE
+=============================== */
+
+@media (max-width: 600px) {
+  .coding-text {
+    font-size: 12px;
+    padding: 12px;
+  }
+}
