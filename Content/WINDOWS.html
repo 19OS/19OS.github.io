@@ -254,12 +254,26 @@ function bringToFront(el){
   el.style.zIndex=z;
 }
 
-function openWindow(id){
-  let el=document.getElementById(id);
+function openWindow(id) {
+  const el = document.getElementById(id);
+  if (!el) return;
+
   el.classList.remove("hidden");
+
+  // IMPORTANT: force valid positioning if broken
+  const rect = el.getBoundingClientRect();
+
+  if (!el.style.left || el.style.left === "auto") {
+    el.style.left = rect.left + "px";
+  }
+
+  if (!el.style.top || el.style.top === "auto") {
+    el.style.top = rect.top + "px";
+  }
+
   bringToFront(el);
 
-  if(id==="cameraApp") startCamera();
+  if (id === "cameraApp") startCamera();
 }
 
 function closeWindow(id){
@@ -274,46 +288,45 @@ function closeWindow(id){
 
 // DRAG
 document.querySelectorAll(".appwindow").forEach(win => {
-  let bar = win.querySelector(".window-titlebar");
+  const bar = win.querySelector(".window-titlebar");
+  if (!bar) return;
 
-  const startDrag = (e) => {
-    // Determine if it's a touch or mouse event
-    const isTouch = e.type === 'touchstart';
-    const clientX = isTouch ? e.touches[0].clientX : e.clientX;
-    const clientY = isTouch ? e.touches[0].clientY : e.clientY;
+  let offsetX = 0;
+  let offsetY = 0;
+  let dragging = false;
 
-    // Prevent scrolling/selection
-    if (e.cancelable) e.preventDefault(); 
-    
+  const start = (e) => {
+    e.preventDefault();
     bringToFront(win);
 
+    const p = e.touches ? e.touches[0] : e;
+
     const rect = win.getBoundingClientRect();
-    const shiftX = clientX - rect.left;
-    const shiftY = clientY - rect.top;
+    offsetX = p.clientX - rect.left;
+    offsetY = p.clientY - rect.top;
 
-    function move(e) {
-      const moveX = isTouch ? e.touches[0].clientX : e.clientX;
-      const moveY = isTouch ? e.touches[0].clientY : e.clientY;
-      
-      win.style.left = moveX - shiftX + "px";
-      win.style.top = moveY - shiftY + "px";
-    }
-
-    // Add listeners to document to handle fast movement
-    const moveEvent = isTouch ? "touchmove" : "mousemove";
-    const endEvent = isTouch ? "touchend" : "mouseup";
-
-    document.addEventListener(moveEvent, move, { passive: false });
-
-    document.addEventListener(endEvent, () => {
-      document.removeEventListener(moveEvent, move);
-    }, { once: true });
+    dragging = true;
   };
 
-  bar.onmousedown = startDrag;
-  bar.ontouchstart = startDrag;
+  const move = (e) => {
+    if (!dragging) return;
 
-  bar.ondragstart = () => false;
+    const p = e.touches ? e.touches[0] : e;
+
+    win.style.left = (p.clientX - offsetX) + "px";
+    win.style.top = (p.clientY - offsetY) + "px";
+  };
+
+  const end = () => dragging = false;
+
+  bar.addEventListener("mousedown", start);
+  bar.addEventListener("touchstart", start, { passive: false });
+
+  document.addEventListener("mousemove", move);
+  document.addEventListener("touchmove", move, { passive: false });
+
+  document.addEventListener("mouseup", end);
+  document.addEventListener("touchend", end);
 });
 // CONTROL CENTER FIX
 function toggleControlCenter(){
