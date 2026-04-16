@@ -17,8 +17,7 @@ html, body {
 header {
   width: 100%; /* Better than 100vw to avoid scrollbar overlaps */
   display: flex; /* Added display: flex so align/justify actually work */
-  align-items: center;
-  justify-content: center;
+
   padding: 1rem; /* Visual breathing room */
 }
 
