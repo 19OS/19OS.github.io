@@ -1,22 +1,21 @@
-/* =========================
-   ⚡ GLOBAL FIX
-========================= */
-
-/* Prevent layout bugs */
 * {
-  box-sizing: border-box;
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
 }
 
-/* Smooth rendering */
-html, body {
-  margin: 0;
-  padding: 0;
-  overflow: hidden;
+body {
+  font-family:"Segoe UI", Arial, sans-serif;
+  height:100vh;
+  background:linear-gradient(120deg,#4facfe,#00f2fe);
+  color: var(--text-light);
 }
 
-/* GPU acceleration */
-.appwindow,
-.dock,
-.cc-panel {
-  will-change: transform;
+.glass {
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--blur)) saturate(160%);
+  -webkit-backdrop-filter: blur(var(--blur));
+  border:1px solid var(--glass-border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-soft);
 }
