@@ -325,44 +325,52 @@ function closeWindow(id){
 
 // DRAG
 document.querySelectorAll(".appwindow").forEach(win => {
-  let bar = win.querySelector(".window-titlebar");
+  const bar = win.querySelector(".window-titlebar");
+
+  if (!bar) return;
 
   const startDrag = (e) => {
-    // Determine if it's a touch or mouse event
-    const isTouch = e.type === 'touchstart';
-    const clientX = isTouch ? e.touches[0].clientX : e.clientX;
-    const clientY = isTouch ? e.touches[0].clientY : e.clientY;
+    const isTouch = e.type === "touchstart";
 
-    // Prevent scrolling/selection
-    if (e.cancelable) e.preventDefault(); 
-    
+    const getX = (ev) => isTouch ? ev.touches[0].clientX : ev.clientX;
+    const getY = (ev) => isTouch ? ev.touches[0].clientY : ev.clientY;
+
+    if (e.cancelable) e.preventDefault();
+
     bringToFront(win);
 
     const rect = win.getBoundingClientRect();
-    const shiftX = clientX - rect.left;
-    const shiftY = clientY - rect.top;
+    const shiftX = getX(e) - rect.left;
+    const shiftY = getY(e) - rect.top;
 
-    function move(e) {
-      const moveX = isTouch ? e.touches[0].clientX : e.clientX;
-      const moveY = isTouch ? e.touches[0].clientY : e.clientY;
-      
-      win.style.left = moveX - shiftX + "px";
-      win.style.top = moveY - shiftY + "px";
-    }
+    const move = (ev) => {
+      if (isTouch && !ev.touches.length) return;
 
-    // Add listeners to document to handle fast movement
+      const x = getX(ev) - shiftX;
+      const y = getY(ev) - shiftY;
+
+      // Optional: keep window inside viewport
+      const maxX = window.innerWidth - win.offsetWidth;
+      const maxY = window.innerHeight - win.offsetHeight;
+
+      win.style.left = Math.max(0, Math.min(x, maxX)) + "px";
+      win.style.top = Math.max(0, Math.min(y, maxY)) + "px";
+    };
+
+    const end = () => {
+      document.removeEventListener(moveEvent, move);
+      document.removeEventListener(endEvent, end);
+    };
+
     const moveEvent = isTouch ? "touchmove" : "mousemove";
     const endEvent = isTouch ? "touchend" : "mouseup";
 
     document.addEventListener(moveEvent, move, { passive: false });
-
-    document.addEventListener(endEvent, () => {
-      document.removeEventListener(moveEvent, move);
-    }, { once: true });
+    document.addEventListener(endEvent, end);
   };
 
-  bar.onmousedown = startDrag;
-  bar.ontouchstart = startDrag;
+  bar.addEventListener("mousedown", startDrag);
+  bar.addEventListener("touchstart", startDrag, { passive: false });
 
   bar.ondragstart = () => false;
 });
