@@ -300,9 +300,13 @@ async function startCamera(){
 // WINDOW SYSTEM
 let z=100;
 
-function bringToFront(el){
-  z++;
-  el.style.zIndex=z;
+function bringToFront(win) {
+  let maxZ = 0;
+  document.querySelectorAll(".appwindow").forEach(w => {
+    const z = parseInt(getComputedStyle(w).zIndex) || 0;
+    if (z > maxZ) maxZ = z;
+  });
+  win.style.zIndex = maxZ + 1;
 }
 
 function openWindow(id){
