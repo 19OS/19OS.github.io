@@ -1,444 +1,331 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>19OS</title>
-
-<link rel="stylesheet" href="CSS/main.css">
-
-<style>
-/* ===============================
-   🍎 CONTROL CENTER
-=============================== */
-.cc {
-  position: fixed;
-  top: 0;
-  right: 0;
-  width: 100%;
-  height: 100%;
-  display: flex;
-  justify-content: flex-end;
-  align-items: flex-start;
-  pointer-events: none;
-}
-
-.cc-panel {
-  width: 320px;
-  margin: 20px;
-  padding: 16px;
-  border-radius: 20px;
-  background: rgba(255,255,255,0.08);
-  backdrop-filter: blur(25px);
-  transform: translateY(-20px) scale(0.95);
-  opacity: 0;
-  transition: 0.3s ease;
-  pointer-events: auto;
-}
-
-.cc.show .cc-panel {
-  transform: translateY(0) scale(1);
-  opacity: 1;
-}
-
-.cc-buttons button {
-  flex: 1;
-  padding: 10px;
-  border-radius: 12px;
-  border: none;
-  background: rgba(255,255,255,0.1);
-  color: white;
-  cursor: pointer;
-}
-
-#ccToggle {
-  position: fixed;
-  top: 10px;
-  right: 10px;
-  z-index: 9999;
-}
-
-.hidden { display: none; }
-
-/* ================= WINDOW ================= */
-.appwindow {
-  position: absolute;
-  width: 420px;
-  height: 320px;
-  display: flex;
-  flex-direction: column;
-  border-radius: 18px;
-  background: rgba(255,255,255,0.08);
-  backdrop-filter: blur(25px);
-  box-shadow: 0 10px 40px rgba(0,0,0,0.4);
-  transition: 0.2s ease;
-}
-
-.window-titlebar {
-  height: 35px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0 10px;
-  cursor: move;
-  background: rgba(255,255,255,0.1);
-}
-
-.window-content {
-  flex: 1;
-  width: 100%;
-  border: none;
-}
-
-/* ================= RESIZE ================= */
-.resize-handle {
-  position: absolute;
-}
-
-.resize-br {
-  width: 15px;
-  height: 15px;
-  right: 0;
-  bottom: 0;
-  cursor: nwse-resize;
-}
-
-.resize-r {
-  width: 8px;
-  height: 100%;
-  right: 0;
-  top: 0;
-  cursor: ew-resize;
-}
-
-.resize-b {
-  height: 8px;
-  width: 100%;
-  bottom: 0;
-  left: 0;
-  cursor: ns-resize;
-}
-
-/* ================= DOCK ================= */
-.dock {
-  position: fixed;
-  bottom: 10px;
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  gap: 10px;
-  padding: 10px;
-  border-radius: 20px;
-  background: rgba(255,255,255,0.08);
-  backdrop-filter: blur(25px);
-}
-
-.dock-icon {
-  padding: 10px;
-  border-radius: 12px;
-  cursor: pointer;
-}
-
-/* ================= NOTIFICATIONS ================= */
-#notifications {
-  position: fixed;
-  top: 80px;
-  right: 20px;
-}
-
-.notification {
-  background: rgba(0,0,0,0.7);
-  padding: 10px;
-  border-radius: 10px;
-  margin-bottom: 5px;
-}
-   #systemUpdateLock {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: black;
-  color: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 999999;
-}
-
-.update-box {
-  text-align: center;
-  width: 300px;
-}
-
-.bar {
-  width: 100%;
-  height: 8px;
-  background: #333;
-  border-radius: 10px;
-  overflow: hidden;
-  margin: 20px 0;
-}
-
-#barFill {
-  width: 0%;
-  height: 100%;
-  background: lime;
-  transition: width 0.2s linear;
-}
-
-#percent {
-  font-size: 14px;
-  opacity: 0.7;
-}
-</style>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>19OS</title>
+  <link rel="stylesheet" href="CSS/main.css">
 </head>
 
 <body>
+<div id="desktop">
 
-<!-- CONTROL CENTER -->
-<div id="controlCenter" class="cc hidden">
-  <div class="cc-panel glass">
-    <div>Control Center</div>
+  <h2 class="title">19OS</h2>
 
-    <div>
-      <button onclick="setFocusMode('gaming')">🎮</button>
-      <button onclick="setFocusMode('coding')">💻</button>
-      <button onclick="setFocusMode('chill')">🌙</button>
-    </div>
-
-    <div>
-      <button onclick="toggleWifi()">📶</button>
-      <button onclick="toggleSound()">🔊</button>
-      <button onclick="toggleTheme()">🎨</button>
+  <!-- WINDOWS -->
+  <div id="myApp" class="appwindow hidden">
+    <div class="resize-handle resize-br"></div> <!-- bottom right -->
+<div class="resize-handle resize-r"></div>  <!-- right -->
+<div class="resize-handle resize-b"></div>  <!-- bottom -->
+  <div class="window-titlebar">
+    <span>My App</span>
+    <div class="window-controls">
+      <button onclick="closeWindow('myApp')">×</button>
     </div>
   </div>
+  <iframe src="Apps/com.calc.app/Index.html" class="window-content" style="width: 100%; height:100%;"></iframe>
 </div>
-
-<button id="ccToggle" onclick="toggleControlCenter()">⚙️</button>
-
-<h2>19OS</h2>
-
-<!-- WINDOWS -->
-<div id="updateScreen" class="update-ui">
-  <h2>System Update</h2>
-  
-  <p id="updateStatus">Idle</p>
-
-  <div class="progress-bar">
-    <div id="updateProgress"></div>
-  </div>
-
-  
-</div>
-   
-<div id="cameraApp" class="appwindow hidden">
-  <div class="resize-handle resize-br"></div>
-  <div class="resize-handle resize-r"></div>
-  <div class="resize-handle resize-b"></div>
-
+  <div id="secret" class="appwindow hidden">
+    <div class="resize-handle resize-br"></div> <!-- bottom right -->
+<div class="resize-handle resize-r"></div>  <!-- right -->
+<div class="resize-handle resize-b"></div>  <!-- bottom -->
   <div class="window-titlebar">
-    <span>Camera</span>
-    <button onclick="closeWindow('cameraApp')">×</button>
+    <span>My App</span>
+    <div class="window-controls">
+      <button onclick="closeWindow('secret')">×</button>
+    </div>
   </div>
-
-  <video id="cameraVideo" autoplay playsinline></video>
-  <canvas id="cameraCanvas" class="hidden"></canvas>
-
-  <button id="snapBtn">📸</button>
-  <button id="switchBtn">🔄</button>
-  <button id="downloadBtn" class="hidden">💾</button>
+  <iframe src="Apps/com.os.secretlang/Index.html" class="window-content" style="width: 100%; height:100%;"></iframe>
 </div>
-
-<!-- KEEPING YOUR APPS -->
-<div id="myApp" class="appwindow hidden">
+  <div id="poki" class="appwindow hidden">
+    <div class="resize-handle resize-br"></div> <!-- bottom right -->
+<div class="resize-handle resize-r"></div>  <!-- right -->
+<div class="resize-handle resize-b"></div>  <!-- bottom -->
   <div class="window-titlebar">
-    <span>Calculator</span>
-    <button onclick="closeWindow('myApp')">×</button>
+    <span>My App</span>
+    <div class="window-controls">
+      <button onclick="closeWindow('poki')">×</button>
+    </div>
   </div>
-  <iframe src="Apps/com.calc.app/Index.html" class="window-content"></iframe>
+  <iframe src="https://poki.com/" class="window-content" style="width: 100%; height:100%;"></iframe>
 </div>
-
-<div id="browser" class="appwindow hidden">
+  <div id="crashViewer" class="appwindow hidden">
+    <div class="resize-handle resize-br"></div> <!-- bottom right -->
+<div class="resize-handle resize-r"></div>  <!-- right -->
+<div class="resize-handle resize-b"></div>  <!-- bottom -->
   <div class="window-titlebar">
-    <span>Browser</span>
-    <button onclick="closeWindow('browser')">×</button>
+    <span>Crash Viewer</span>
+    <button onclick="closeWindow('crashViewer')">✖</button>
   </div>
-  <iframe src="Apps/com.browser.app/Index.html" class="window-content"></iframe>
+
+  <div id="crashList"></div>
+
+  <button onclick="clearCrashes()">Clear Logs</button>
+</div>
+  <!-- DOCK -->
+  <div class="dock glass">
+    <button class="dock-icon" onclick="openWindow('myApp')">Calculator</button>
+     <button class="dock-icon" onclick="openWindow('secret')">Secret Lang</button>
+    <button class="dock-icon" onclick="openWindow('poki')">Poki</button>
+    <button class="dock-icon" onclick="openWindow('crashViewer')">Crashviewer</button>
+  </div>
+
 </div>
 
-<!-- DOCK -->
-<div class="dock">
-  <button onclick="openWindow('myApp')">Calc</button>
-  <button onclick="openWindow('browser')">🌐</button>
-  <button onclick="openWindow('cameraApp')">📷</button>
-  <button onclick="openPoki()">🎮</button>
-</div>
-
-<div id="notifications"></div>
-
-<script src="js/Mode.js"></script>
-   <script src="js/UpdatingPage.js"></script>
-<script src="js/Plugin.js"></script>
 <script>
-// CAMERA FIX
-let currentStream=null;
-let useFront=true;
+  // ===============================
+// 19OS WINDOW SYSTEM (FULL)
+// ===============================
 
-async function startCamera(){
-  if(currentStream){
-    currentStream.getTracks().forEach(t=>t.stop());
-  }
+// ---------- Open / Close ----------
+function openWindow(id) {
+  const el = document.getElementById(id);
+  if (!el) return console.warn("Window not found:", id);
 
-  currentStream = await navigator.mediaDevices.getUserMedia({
-    video:{ facingMode: useFront ? "user":"environment" }
-  });
-
-  cameraVideo.srcObject = currentStream;
-}
-
-// WINDOW SYSTEM
-let z=100;
-
-function bringToFront(el){
-  z++;
-  el.style.zIndex=z;
-}
-
-function openWindow(id){
-  let el=document.getElementById(id);
   el.classList.remove("hidden");
+  el.style.display = "block";
+
   bringToFront(el);
-
-  if(id==="cameraApp") startCamera();
 }
 
-function closeWindow(id){
-  let el=document.getElementById(id);
-  el.classList.add("hidden");
+/**
+ * Safely closes a window element by ID.
+ * @param {string} id - The DOM ID of the element to close.
+ */
+function closeWindow(id) {
+  console.log("closeWindow called:", id);
 
-  if(id==="cameraApp" && currentStream){
-    currentStream.getTracks().forEach(t=>t.stop());
-    currentStream=null;
+  const el = document.getElementById(id);
+
+  if (!el) {
+    console.warn("NOT FOUND:", id);
+    return;
   }
+
+  el.style.display = "none";
+  el.style.pointerEvents = "none";
+  el.style.zIndex = "-1";
+
+  console.log("Closed:", el);
 }
 
-// DRAG
-document.querySelectorAll(".appwindow").forEach(win => {
-  const handles = win.querySelectorAll(".resize-handle");
+// ---------- Z-Index System ----------
+let zIndexCounter = 100;
+
+function bringToFront(windowEl) {
+  zIndexCounter++;
+  windowEl.style.zIndex = zIndexCounter;
+}
+
+// ===============================
+// DRAG SYSTEM (ULTRA SMOOTH)
+// ===============================
+function makeDraggable(windowEl) {
+  const header = windowEl.querySelector(".window-titlebar");
+  if (!header) return;
+
+  let isDragging = false;
+  let offsetX = 0;
+  let offsetY = 0;
+
+  let targetX = 0;
+  let targetY = 0;
+
+  let currentX = 0;
+  let currentY = 0;
+
+  let rafId = null;
+
+  function getPos(e) {
+    return e.touches
+      ? { x: e.touches[0].clientX, y: e.touches[0].clientY }
+      : { x: e.clientX, y: e.clientY };
+  }
+
+  function startDrag(e) {
+    e.preventDefault();
+    isDragging = true;
+
+    bringToFront(windowEl);
+
+    const rect = windowEl.getBoundingClientRect();
+    const pos = getPos(e);
+
+    offsetX = pos.x - rect.left;
+    offsetY = pos.y - rect.top;
+
+    document.addEventListener("mousemove", drag);
+    document.addEventListener("mouseup", stopDrag);
+    document.addEventListener("touchmove", drag, { passive: false });
+    document.addEventListener("touchend", stopDrag);
+  }
+
+  function drag(e) {
+    if (!isDragging) return;
+    e.preventDefault();
+
+    const pos = getPos(e);
+
+    targetX = pos.x - offsetX;
+    targetY = pos.y - offsetY;
+
+    if (!rafId) rafId = requestAnimationFrame(updatePosition);
+  }
+
+  function updatePosition() {
+    currentX = targetX;
+    currentY = targetY;
+
+    windowEl.style.transform = `translate3d(${currentX}px, ${currentY}px, 0)`;
+
+    rafId = null;
+  }
+
+  function stopDrag() {
+    isDragging = false;
+
+    document.removeEventListener("mousemove", drag);
+    document.removeEventListener("mouseup", stopDrag);
+    document.removeEventListener("touchmove", drag);
+    document.removeEventListener("touchend", stopDrag);
+  }
+
+  header.addEventListener("mousedown", startDrag);
+  header.addEventListener("touchstart", startDrag, { passive: false });
+}
+
+// ===============================
+// RESIZE SYSTEM (SMOOTH)
+// ===============================
+function makeResizable(windowEl) {
+  const handles = windowEl.querySelectorAll(".resize-handle");
 
   handles.forEach(handle => {
-    handle.onmousedown = function(e) {
+    let isResizing = false;
+
+    let startX, startY;
+    let startWidth, startHeight;
+
+    let targetWidth, targetHeight;
+    let rafId = null;
+
+    function getPos(e) {
+      return e.touches
+        ? { x: e.touches[0].clientX, y: e.touches[0].clientY }
+        : { x: e.clientX, y: e.clientY };
+    }
+
+    function startResize(e) {
       e.preventDefault();
-      bringToFront(win);
+      isResizing = true;
 
-      const startWidth = win.offsetWidth;
-      const startHeight = win.offsetHeight;
-      const startX = e.clientX;
-      const startY = e.clientY;
+      bringToFront(windowEl);
 
-      function doResize(e) {
-        if (handle.classList.contains('resize-r') || handle.classList.contains('resize-br')) {
-          win.style.width = startWidth + (e.clientX - startX) + 'px';
-        }
-        if (handle.classList.contains('resize-b') || handle.classList.contains('resize-br')) {
-          win.style.height = startHeight + (e.clientY - startY) + 'px';
-        }
+      const rect = windowEl.getBoundingClientRect();
+      const pos = getPos(e);
+
+      startX = pos.x;
+      startY = pos.y;
+
+      startWidth = rect.width;
+      startHeight = rect.height;
+
+      document.addEventListener("mousemove", resize);
+      document.addEventListener("mouseup", stopResize);
+      document.addEventListener("touchmove", resize, { passive: false });
+      document.addEventListener("touchend", stopResize);
+    }
+
+    function resize(e) {
+      if (!isResizing) return;
+      e.preventDefault();
+
+      const pos = getPos(e);
+
+      const dx = pos.x - startX;
+      const dy = pos.y - startY;
+
+      if (handle.classList.contains("resize-r") || handle.classList.contains("resize-br")) {
+        targetWidth = startWidth + dx;
       }
 
-      function stopResize() {
-        document.removeEventListener('mousemove', doResize);
-        document.removeEventListener('mouseup', stopResize);
+      if (handle.classList.contains("resize-b") || handle.classList.contains("resize-br")) {
+        targetHeight = startHeight + dy;
       }
 
-      document.addEventListener('mousemove', doResize);
-      document.addEventListener('mouseup', stopResize);
-    };
+      if (!rafId) rafId = requestAnimationFrame(applyResize);
+    }
+
+    function applyResize() {
+      const minWidth = 200;
+      const minHeight = 150;
+
+      if (targetWidth !== undefined) {
+        windowEl.style.width = Math.max(minWidth, targetWidth) + "px";
+      }
+
+      if (targetHeight !== undefined) {
+        windowEl.style.height = Math.max(minHeight, targetHeight) + "px";
+      }
+
+      rafId = null;
+    }
+
+    function stopResize() {
+      isResizing = false;
+
+      document.removeEventListener("mousemove", resize);
+      document.removeEventListener("mouseup", stopResize);
+      document.removeEventListener("touchmove", resize);
+      document.removeEventListener("touchend", stopResize);
+    }
+
+    handle.addEventListener("mousedown", startResize);
+    handle.addEventListener("touchstart", startResize, { passive: false });
+  });
+}
+
+// ===============================
+// INIT SYSTEM
+// ===============================
+document.addEventListener("DOMContentLoaded", () => {
+  document.querySelectorAll(".appwindow").forEach(win => {
+    makeDraggable(win);
+    makeResizable(win);
   });
 });
-// CONTROL CENTER FIX
-function toggleControlCenter() {
-  const cc = document.getElementById("controlCenter");
-
-  if (cc.classList.contains("show")) {
-    cc.classList.remove("show");
-    
-    // Wait for the transition to actually finish
-    cc.addEventListener('transitionend', () => {
-      cc.classList.add("hidden");
-    }, { once: true }); // { once: true } auto-removes the listener
-    
-  } else {
-    cc.classList.remove("hidden");
-    // RequestAnimationFrame is a cleaner "tick" than setTimeout(10)
-    requestAnimationFrame(() => {
-      cc.classList.add("show");
-    });
-  }
-}
-
-// SAFE CLICK CLOSE
-document.addEventListener("click", e => {
-  const cc = document.getElementById("controlCenter");
-  const toggleBtn = document.getElementById("ccToggle");
-  
-  // 1. Safety check: if CC doesn't exist or isn't currently shown, do nothing
-  if (!cc || !cc.classList.contains("show")) return;
-
-  // 2. Check if the click happened OUTSIDE the panel AND OUTSIDE the toggle button
-  // .closest() handles cases where you click an icon inside the button
-  const clickedInsidePanel = cc.contains(e.target);
-  const clickedToggle = toggleBtn && toggleBtn.contains(e.target);
-
-  if (!clickedInsidePanel && !clickedToggle) {
-    // Start the close animation
-    cc.classList.remove("show");
-
-    // Wait for the CSS transition (e.g., 200ms) before applying display: none
-    setTimeout(() => {
-      // Re-verify it hasn't been reopened during the timeout
-      if (!cc.classList.contains("show")) {
-        cc.classList.add("hidden");
-      }
-    }, 200);
-  }
-});
-
-// SYSTEM
-function notify(msg) {
-  // 1. Ensure the container exists
-  const container = document.getElementById("notifications") || document.body;
-
-  // 2. Create the element
-  const n = document.createElement("div");
-  n.className = "notification";
-  n.innerText = msg;
-
-  // 3. Append to the container
-  container.appendChild(n);
-
-  // 4. Clean up with a fade-out (optional but recommended)
-  setTimeout(() => {
-    n.classList.add("fade-out"); // Add a CSS class for a smooth exit
-    n.addEventListener("transitionend", () => n.remove());
-    
-    // Fallback if no CSS transition is defined
-    if (getComputedStyle(n).transitionDuration === "0s") {
-      n.remove();
-    }
-  }, 3000);
-}
-
-function toggleWifi(){ notify("WiFi toggled"); }
-function toggleSound(){ notify("Sound toggled"); }
-function toggleTheme(){ notify("Theme switched"); }
-function setFocusMode(m){ notify("Mode: "+m); }
-
-// POKI FIX
-function openPoki(){
-  window.open("https://poki.com","_blank");
-}
 </script>
+  <script src="js/crashlogger.js"></script>
+  <script>
+    function openCrashViewer() {
+  openWindow("crashViewer");
+  renderCrashLogs();
+}
 
+function renderCrashLogs() {
+  const list = document.getElementById("crashList");
+  list.innerHTML = "";
+
+  CrashLogger.logs.forEach(log => {
+    const item = document.createElement("div");
+    item.className = "crash-item";
+
+    item.innerHTML = `
+      <b>${log.source}</b> - ${log.time}<br>
+      ${log.message}
+      <details>
+        <summary>Stack</summary>
+        <pre>${log.stack}</pre>
+      </details>
+    `;
+
+    list.appendChild(item);
+  });
+}
+
+function clearCrashes() {
+  CrashLogger.clear();
+  renderCrashLogs();
+}
+  </script>
 </body>
 </html>
