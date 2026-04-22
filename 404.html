@@ -16,22 +16,43 @@ body {
   align-items: center;
   justify-content: center;
 
-  background: linear-gradient(135deg, #0f172a, #1e293b);
+  background: radial-gradient(circle at top, #1e293b, #020617);
   color: white;
   overflow: hidden;
 }
 
+/* ===== BACKGROUND PARTICLES ===== */
+.particle {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  background: rgba(255,255,255,0.2);
+  border-radius: 50%;
+  animation: float linear infinite;
+}
+
+@keyframes float {
+  from {
+    transform: translateY(100vh);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(-10vh);
+    opacity: 1;
+  }
+}
+
 /* ===== GLASS CARD ===== */
 .card {
-  width: 380px;
+  width: 400px;
   padding: 30px;
-  border-radius: 20px;
+  border-radius: 22px;
 
   background: rgba(255,255,255,0.06);
-  backdrop-filter: blur(25px);
-  -webkit-backdrop-filter: blur(25px);
+  backdrop-filter: blur(30px);
+  -webkit-backdrop-filter: blur(30px);
 
-  box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+  box-shadow: 0 15px 60px rgba(0,0,0,0.6);
   text-align: center;
 
   animation: fadeIn 0.6s ease;
@@ -39,21 +60,24 @@ body {
 
 /* ===== TEXT ===== */
 .code {
-  font-size: 72px;
-  font-weight: 800;
-  opacity: 0.9;
+  font-size: 80px;
+  font-weight: 900;
+  letter-spacing: 2px;
+  background: linear-gradient(90deg, #38bdf8, #818cf8);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 .title {
   font-size: 20px;
   margin-top: -10px;
-  opacity: 0.8;
+  opacity: 0.85;
 }
 
 .desc {
   font-size: 14px;
   opacity: 0.6;
-  margin: 15px 0 25px;
+  margin: 15px 0 20px;
 }
 
 /* ===== BUTTONS ===== */
@@ -62,19 +86,19 @@ body {
   padding: 10px 18px;
   margin: 5px;
 
-  border-radius: 10px;
+  border-radius: 12px;
   text-decoration: none;
   font-size: 14px;
 
-  background: rgba(255,255,255,0.1);
+  background: rgba(255,255,255,0.08);
   color: white;
 
-  transition: 0.2s;
+  transition: 0.25s;
 }
 
 .btn:hover {
   background: rgba(255,255,255,0.2);
-  transform: translateY(-2px);
+  transform: translateY(-3px);
 }
 
 /* ===== OS STYLE DOTS ===== */
@@ -99,17 +123,44 @@ body {
 @keyframes fadeIn {
   from {
     opacity: 0;
-    transform: translateY(20px);
+    transform: scale(0.95) translateY(20px);
   }
   to {
     opacity: 1;
-    transform: translateY(0);
+    transform: scale(1) translateY(0);
   }
+}
+
+/* ===== LOADING BAR ===== */
+.bar {
+  height: 4px;
+  width: 0%;
+  margin-top: 15px;
+  border-radius: 10px;
+  background: linear-gradient(90deg, #38bdf8, #818cf8);
+  animation: load 6s linear forwards;
+}
+
+@keyframes load {
+  from { width: 0%; }
+  to { width: 100%; }
 }
 </style>
 </head>
 
 <body>
+
+<!-- PARTICLES -->
+<script>
+for (let i = 0; i < 25; i++) {
+  const p = document.createElement("div");
+  p.className = "particle";
+  p.style.left = Math.random() * 100 + "vw";
+  p.style.animationDuration = (5 + Math.random() * 10) + "s";
+  p.style.opacity = Math.random();
+  document.body.appendChild(p);
+}
+</script>
 
 <div class="card">
   <div class="dots">
@@ -119,14 +170,24 @@ body {
   </div>
 
   <div class="code">404</div>
-  <div class="title">App Not Found</div>
+  <div class="title">OS Not Found</div>
   <div class="desc">
-    <p>19OS has been moved! </p>
+    This OS doesn’t exist or has been moved.<br>
+    Diese OS existiert nicht mehr oder wurde verschoben. es tut uns wirklich leid dass die 19OS zerstört wurde!
   </div>
 
   <a href="/" class="btn">🏠 Home</a>
   <a href="#" class="btn" onclick="history.back()">⬅ Back</a>
+
+  <div class="bar"></div>
 </div>
+
+<script>
+// AUTO REDIRECT (feels like OS fallback)
+setTimeout(() => {
+  window.location.href = "/";
+}, 6000);
+</script>
 
 </body>
 </html>
