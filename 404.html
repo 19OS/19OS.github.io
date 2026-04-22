@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>19OS – 404</title>
+
+<style>
+/* ===== GLOBAL ===== */
+body {
+  margin: 0;
+  height: 100vh;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: linear-gradient(135deg, #0f172a, #1e293b);
+  color: white;
+  overflow: hidden;
+}
+
+/* ===== GLASS CARD ===== */
+.card {
+  width: 380px;
+  padding: 30px;
+  border-radius: 20px;
+
+  background: rgba(255,255,255,0.06);
+  backdrop-filter: blur(25px);
+  -webkit-backdrop-filter: blur(25px);
+
+  box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+  text-align: center;
+
+  animation: fadeIn 0.6s ease;
+}
+
+/* ===== TEXT ===== */
+.code {
+  font-size: 72px;
+  font-weight: 800;
+  opacity: 0.9;
+}
+
+.title {
+  font-size: 20px;
+  margin-top: -10px;
+  opacity: 0.8;
+}
+
+.desc {
+  font-size: 14px;
+  opacity: 0.6;
+  margin: 15px 0 25px;
+}
+
+/* ===== BUTTONS ===== */
+.btn {
+  display: inline-block;
+  padding: 10px 18px;
+  margin: 5px;
+
+  border-radius: 10px;
+  text-decoration: none;
+  font-size: 14px;
+
+  background: rgba(255,255,255,0.1);
+  color: white;
+
+  transition: 0.2s;
+}
+
+.btn:hover {
+  background: rgba(255,255,255,0.2);
+  transform: translateY(-2px);
+}
+
+/* ===== OS STYLE DOTS ===== */
+.dots {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 15px;
+  justify-content: center;
+}
+
+.dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+.red { background: #ff5f57; }
+.yellow { background: #febb2e; }
+.green { background: #28c840; }
+
+/* ===== ANIMATION ===== */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+</style>
+</head>
+
+<body>
+
+<div class="card">
+  <div class="dots">
+    <div class="dot red"></div>
+    <div class="dot yellow"></div>
+    <div class="dot green"></div>
+  </div>
+
+  <div class="code">404</div>
+  <div class="title">App Not Found</div>
+  <div class="desc">
+    <p>19OS has been moved! </p>
+  </div>
+
+  <a href="/" class="btn">🏠 Home</a>
+  <a href="#" class="btn" onclick="history.back()">⬅ Back</a>
+</div>
+
+</body>
+</html>
